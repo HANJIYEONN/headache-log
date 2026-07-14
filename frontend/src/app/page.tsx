@@ -36,14 +36,14 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-2xl space-y-8 p-6">
-      <h1 className="text-2xl font-bold text-pink-600">🩷 두통 기록 차트</h1>
+      <h1 className="text-2xl font-bold text-teal-600">두통 기록 차트</h1>
 
       {/* 입력 폼 — 저장이 끝나면 onSaved로 load()가 실행돼서 목록이 새로고침돼요 */}
       <EntryForm onSaved={load} />
 
       {/* 기록 목록 (임시 간단 버전 — 나중에 목록/달력/차트 3탭으로 업그레이드 예정!) */}
       <section className="space-y-3">
-        <h2 className="text-lg font-bold">최근 기록 📋</h2>
+        <h2 className="text-lg font-bold">최근 기록</h2>
         {entries.length === 0 && (
           <p className="text-sm text-gray-500">
             아직 기록이 없어요. 첫 기록을 남겨보세요!
@@ -59,10 +59,10 @@ export default function Home() {
               <p className="font-semibold">{entry.entry_date}</p>
               <p className="text-gray-600">
                 {entry.took_painkiller
-                  ? `약 ${entry.dose_count ?? "?"}회 복용 · ${entry.effective ? "효과 있음 ✅" : "효과 없음 ❌"}`
+                  ? `약 ${entry.dose_count ?? "?"}회 복용 · ${entry.effective ? "효과 있음" : "효과 없음"}`
                   : "약 안 먹음"}
                 {entry.trigger && ` · 촉발요인: ${entry.trigger}`}
-                {entry.menstruating && " · 생리기간 🌸"}
+                {entry.menstruating && " · 생리기간"}
               </p>
               {entry.bp_systolic && (
                 <p className="text-gray-500">

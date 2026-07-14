@@ -13,7 +13,10 @@
       "Bash(brew install *)",
       "Bash(mkdir -p /Users/han/Documents/workSpace/backend/app)",
       "Bash(python3 -m venv .venv)",
-      "Bash(.venv/bin/pip install *)"
+      "Bash(.venv/bin/pip install *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'UI 조정: 민트\\(teal\\) 색상으로 변경, 이모지 제거, 생리기간 위치 이동 *)",
+      "Bash(git push *)"
     ]
   }
 }

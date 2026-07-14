@@ -58,10 +58,10 @@ export default function EntryForm({ onSaved }: Props) {
       await createEntry(payload); // 백엔드에 저장 요청 📤
       setForm(emptyForm());       // 폼 비우기
       setRecordBp(false);
-      setMessage("저장했어요! 🎉");
+      setMessage("저장했어요!");
       onSaved();                 // 부모에게 "저장했어!" 알리기
     } catch {
-      setMessage("앗, 저장에 실패했어요 😢 백엔드가 켜져 있는지 확인해주세요");
+      setMessage("저장에 실패했어요. 백엔드가 켜져 있는지 확인해주세요.");
     } finally {
       setSaving(false);
     }
@@ -69,8 +69,8 @@ export default function EntryForm({ onSaved }: Props) {
 
   // ── 화면(JSX) : HTML처럼 생겼지만 { } 안에 자바스크립트를 쓸 수 있어요 ──
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-pink-200 bg-white p-6 text-gray-900 shadow-sm">
-      <h2 className="text-lg font-bold text-pink-600">오늘의 두통 기록 ✏️</h2>
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-teal-200 bg-white p-6 text-gray-900 shadow-sm">
+      <h2 className="text-lg font-bold text-teal-600">오늘의 두통 기록</h2>
 
       {/* 날짜 */}
       <label className="block">
@@ -84,21 +84,11 @@ export default function EntryForm({ onSaved }: Props) {
         />
       </label>
 
-      {/* 생리기간 체크 */}
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={form.menstruating}
-          onChange={(e) => update("menstruating", e.target.checked)}
-        />
-        <span className="text-sm">생리기간</span>
-      </label>
-
       {/* 투약 정보 — 통증약은 항상 복용하니까 늘 보여주고, 복용횟수는 필수! */}
-      <div className="flex gap-4 rounded-lg bg-pink-50 p-3">
+      <div className="flex gap-4">
         <label className="block flex-1">
           <span className="text-sm">
-            복용횟수 <span className="text-pink-500">*</span>
+            복용횟수 <span className="text-teal-500">*</span>
           </span>
           <input
             type="number"
@@ -138,11 +128,11 @@ export default function EntryForm({ onSaved }: Props) {
           checked={recordBp}
           onChange={(e) => setRecordBp(e.target.checked)}
         />
-        <span className="text-sm">혈압도 기록하기 🩺</span>
+        <span className="text-sm">혈압도 기록하기</span>
       </label>
 
       {recordBp && (
-      <div className="grid grid-cols-3 gap-3 rounded-lg bg-pink-50 p-3">
+      <div className="grid grid-cols-3 gap-3 rounded-lg bg-teal-50 p-3">
         <label className="block">
           <span className="text-sm">수축기</span>
           <input
@@ -176,13 +166,23 @@ export default function EntryForm({ onSaved }: Props) {
       </div>
       )}
 
+      {/* 생리기간 체크 */}
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={form.menstruating}
+          onChange={(e) => update("menstruating", e.target.checked)}
+        />
+        <span className="text-sm">생리기간</span>
+      </label>
+
       {/* 저장 버튼 */}
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-xl bg-pink-500 py-2.5 font-semibold text-white transition hover:bg-pink-600 disabled:opacity-50"
+        className="w-full rounded-xl bg-teal-500 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
       >
-        {saving ? "저장 중..." : "기록 저장하기 💾"}
+        {saving ? "저장 중..." : "기록 저장하기"}
       </button>
 
       {/* 안내 메시지 (있을 때만 표시) */}

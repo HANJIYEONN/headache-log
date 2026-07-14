@@ -69,8 +69,8 @@ export default function EntryForm({ onSaved }: Props) {
 
   // ── 화면(JSX) : HTML처럼 생겼지만 { } 안에 자바스크립트를 쓸 수 있어요 ──
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-teal-200 bg-white p-6 text-gray-900 shadow-sm">
-      <h2 className="text-lg font-bold text-teal-600">오늘의 두통 기록</h2>
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-teal-100 bg-white p-6 text-gray-900 shadow-sm">
+      <h2 className="text-lg font-bold text-teal-500">오늘의 두통 기록</h2>
 
       {/* 날짜 */}
       <label className="block">
@@ -88,7 +88,7 @@ export default function EntryForm({ onSaved }: Props) {
       <div className="flex gap-4">
         <label className="block flex-1">
           <span className="text-sm">
-            복용횟수 <span className="text-teal-500">*</span>
+            복용횟수 <span className="text-teal-400">*</span>
           </span>
           <input
             type="number"
@@ -180,7 +180,7 @@ export default function EntryForm({ onSaved }: Props) {
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-xl bg-teal-500 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
+        className="w-full rounded-xl bg-teal-400 py-2.5 font-semibold text-white transition hover:bg-teal-500 disabled:opacity-50"
       >
         {saving ? "저장 중..." : "기록 저장하기"}
       </button>

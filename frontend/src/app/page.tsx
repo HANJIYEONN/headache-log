@@ -1,65 +1,84 @@
-import Image from "next/image";
+"use client";
+// ↑ 버튼 클릭·입력 같은 상호작용이 있는 화면이라 클라이언트 컴포넌트로 선언!
+
+// ─────────────────────────────────────────────
+// page.tsx : 메인 페이지
+// Next.js에서는 app/page.tsx 파일이 곧 "첫 화면(/)"이 돼요
+// ─────────────────────────────────────────────
+
+import { useCallback, useEffect, useState } from "react";
+import EntryForm from "@/components/EntryForm";
+import { fetchEntries, deleteEntry, type Entry } from "@/lib/api";
 
 export default function Home() {
+  // 기록 목록을 기억하는 state
+  const [entries, setEntries] = useState<Entry[]>([]);
+
+  // 백엔드에서 목록을 불러오는 함수
+  const load = useCallback(async () => {
+    try {
+      setEntries(await fetchEntries());
+    } catch {
+      // 백엔드가 꺼져 있으면 일단 빈 목록으로 둬요
+    }
+  }, []);
+
+  // useEffect : "페이지가 처음 열렸을 때 한 번 실행해줘"
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // 삭제 버튼 처리
+  async function handleDelete(id: number) {
+    await deleteEntry(id);
+    load(); // 삭제 후 목록 다시 불러오기
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="mx-auto max-w-2xl space-y-8 p-6">
+      <h1 className="text-2xl font-bold text-pink-600">🩷 두통 기록 차트</h1>
+
+      {/* 입력 폼 — 저장이 끝나면 onSaved로 load()가 실행돼서 목록이 새로고침돼요 */}
+      <EntryForm onSaved={load} />
+
+      {/* 기록 목록 (임시 간단 버전 — 나중에 목록/달력/차트 3탭으로 업그레이드 예정!) */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-bold">최근 기록 📋</h2>
+        {entries.length === 0 && (
+          <p className="text-sm text-gray-500">
+            아직 기록이 없어요. 첫 기록을 남겨보세요!
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        )}
+        {/* map : 배열의 각 항목을 화면 조각으로 하나씩 바꿔주는 반복 */}
+        {entries.map((entry) => (
+          <div
+            key={entry.id}
+            className="flex items-center justify-between rounded-xl border bg-white p-4 text-sm text-gray-900 shadow-sm"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <div>
+              <p className="font-semibold">{entry.entry_date}</p>
+              <p className="text-gray-600">
+                {entry.took_painkiller
+                  ? `약 ${entry.dose_count ?? "?"}회 복용 · ${entry.effective ? "효과 있음 ✅" : "효과 없음 ❌"}`
+                  : "약 안 먹음"}
+                {entry.trigger && ` · 촉발요인: ${entry.trigger}`}
+                {entry.menstruating && " · 생리기간 🌸"}
+              </p>
+              {entry.bp_systolic && (
+                <p className="text-gray-500">
+                  혈압 {entry.bp_systolic}/{entry.bp_diastolic} · 맥박 {entry.bp_pulse}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => handleDelete(entry.id)}
+              className="text-xs text-gray-400 hover:text-red-500"
+            >
+              삭제
+            </button>
+          </div>
+        ))}
+      </section>
+    </main>
   );
 }

@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+backend/.venv/
+.venv/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log

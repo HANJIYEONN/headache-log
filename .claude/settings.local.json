@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npx -v)",
+      "Bash(pip3 --version)",
+      "Bash(git --version)",
+      "Bash(npx --yes create-next-app@latest frontend --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack --yes)",
+      "Bash(git init *)",
+      "Bash(git branch *)",
+      "Bash(psql --version)",
+      "Bash(brew list *)",
+      "Bash(brew install *)",
+      "Bash(mkdir -p /Users/han/Documents/workSpace/backend/app)",
+      "Bash(python3 -m venv .venv)",
+      "Bash(.venv/bin/pip install *)"
+    ]
+  }
+}

@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 연한 민트색 배경 — 앱 전체 분위기를 정하는 색 */
+  --background: #f2faf8;
+  --foreground: #1f3d37;
 }
 
 @theme inline {
@@ -12,12 +13,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* 다크모드여도 앱은 항상 연한 민트 톤을 유지해요 */
 
 body {
   background: var(--background);

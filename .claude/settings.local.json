@@ -17,7 +17,8 @@
       "Bash(git add *)",
       "Bash(git commit -q -m 'UI 조정: 민트\\(teal\\) 색상으로 변경, 이모지 제거, 생리기간 위치 이동 *)",
       "Bash(git push *)",
-      "Bash(git commit -q -m '색상 톤 조정: 민트색을 한 단계 연하게 \\(teal 600→500, 500→400, 200→100\\) *)"
+      "Bash(git commit -q -m '색상 톤 조정: 민트색을 한 단계 연하게 \\(teal 600→500, 500→400, 200→100\\) *)",
+      "Bash(git commit -q -m '연한 파스텔 민트 테마 적용: 배경·버튼·제목 전체 톤 교체 *)"
     ]
   }
 }

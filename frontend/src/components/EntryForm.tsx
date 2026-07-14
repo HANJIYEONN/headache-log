@@ -69,8 +69,8 @@ export default function EntryForm({ onSaved }: Props) {
 
   // ── 화면(JSX) : HTML처럼 생겼지만 { } 안에 자바스크립트를 쓸 수 있어요 ──
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-teal-100 bg-white p-6 text-gray-900 shadow-sm">
-      <h2 className="text-lg font-bold text-teal-500">오늘의 두통 기록</h2>
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#d4efe8] bg-white p-6 text-gray-900 shadow-sm">
+      <h2 className="text-lg font-bold text-[#48a08e]">오늘의 두통 기록</h2>
 
       {/* 날짜 */}
       <label className="block">
@@ -88,7 +88,7 @@ export default function EntryForm({ onSaved }: Props) {
       <div className="flex gap-4">
         <label className="block flex-1">
           <span className="text-sm">
-            복용횟수 <span className="text-teal-400">*</span>
+            복용횟수 <span className="text-[#6cbfae]">*</span>
           </span>
           <input
             type="number"
@@ -132,7 +132,7 @@ export default function EntryForm({ onSaved }: Props) {
       </label>
 
       {recordBp && (
-      <div className="grid grid-cols-3 gap-3 rounded-lg bg-teal-50 p-3">
+      <div className="grid grid-cols-3 gap-3 rounded-lg bg-[#eef8f5] p-3">
         <label className="block">
           <span className="text-sm">수축기</span>
           <input
@@ -180,7 +180,7 @@ export default function EntryForm({ onSaved }: Props) {
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-xl bg-teal-400 py-2.5 font-semibold text-white transition hover:bg-teal-500 disabled:opacity-50"
+        className="w-full rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
       >
         {saving ? "저장 중..." : "기록 저장하기"}
       </button>

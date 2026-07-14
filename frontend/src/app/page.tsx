@@ -36,7 +36,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-2xl space-y-8 p-6">
-      <h1 className="text-2xl font-bold text-teal-500">두통 기록 차트</h1>
+      <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
 
       {/* 입력 폼 — 저장이 끝나면 onSaved로 load()가 실행돼서 목록이 새로고침돼요 */}
       <EntryForm onSaved={load} />

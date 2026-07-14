@@ -53,7 +53,7 @@ workSpace/
 | `id` | integer | 고유 번호 | DB가 자동 부여 (PK) |
 | `entry_date` | date | 날짜 | 필수 |
 | `menstruating` | boolean | 생리기간 유무 | 기본 false |
-| `took_painkiller` | boolean | 통증약 복용여부 | 기본 false |
+| `took_painkiller` | boolean | 통증약 복용여부 | 항상 true (통증약은 늘 복용) |
 | `effective` | boolean | 효과여부 | 약 안 먹으면 비움(null) |
 | `dose_count` | integer | 복용횟수 | null 허용 |
 | `trigger` | text | 촉발요인 | 자유 입력 |
@@ -136,6 +136,7 @@ sequenceDiagram
 ## 7. 정해진 규칙들
 
 - **기록 항목 9개는 확정**: 날짜, 생리기간, 통증약 복용여부, 효과여부, 복용횟수, 촉발요인, 혈압 3종
+- **폼 규칙**: 통증약은 항상 복용 → 복용횟수 필수 입력 / 혈압은 "혈압도 기록하기" 체크 시에만 입력 (2026-07-14 변경)
 - 화면은 **3탭** (목록/달력/차트)
 - 진행 상황은 `TODO.md`에 기록하고 작업 단위마다 커밋
 - 코드에는 배우기 좋게 한글 주석 달기

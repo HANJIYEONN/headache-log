@@ -21,8 +21,8 @@ function emptyForm(): NewEntry {
   return {
     entry_date: new Date().toISOString().slice(0, 10), // "2026-07-14" 형태
     menstruating: false,
-    took_painkiller: false,
-    effective: null,
+    took_painkiller: true, // 통증약은 항상 복용하니까 늘 true!
+    effective: false,
     dose_count: null,
     trigger: null,
     bp_systolic: null,
@@ -37,6 +37,7 @@ export default function EntryForm({ onSaved }: Props) {
   const [form, setForm] = useState<NewEntry>(emptyForm());
   const [saving, setSaving] = useState(false); // 저장 중인지
   const [message, setMessage] = useState("");  // 안내 문구
+  const [recordBp, setRecordBp] = useState(false); // 혈압도 기록할지 여부
 
   // form에서 한 칸만 바꾸는 도우미 함수
   // 예: update("dose_count", 2) → 복용횟수만 2로 변경
@@ -50,8 +51,13 @@ export default function EntryForm({ onSaved }: Props) {
     setSaving(true);
     setMessage("");
     try {
-      await createEntry(form);   // 백엔드에 저장 요청 📤
-      setForm(emptyForm());      // 폼 비우기
+      // 혈압 기록을 껐으면 혈압 값은 비워서(null) 보내요
+      const payload = recordBp
+        ? form
+        : { ...form, bp_systolic: null, bp_diastolic: null, bp_pulse: null };
+      await createEntry(payload); // 백엔드에 저장 요청 📤
+      setForm(emptyForm());       // 폼 비우기
+      setRecordBp(false);
       setMessage("저장했어요! 🎉");
       onSaved();                 // 부모에게 "저장했어!" 알리기
     } catch {
@@ -78,49 +84,40 @@ export default function EntryForm({ onSaved }: Props) {
         />
       </label>
 
-      {/* 체크박스 두 개 */}
-      <div className="flex gap-6">
-        <label className="flex items-center gap-2">
+      {/* 생리기간 체크 */}
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={form.menstruating}
+          onChange={(e) => update("menstruating", e.target.checked)}
+        />
+        <span className="text-sm">생리기간</span>
+      </label>
+
+      {/* 투약 정보 — 통증약은 항상 복용하니까 늘 보여주고, 복용횟수는 필수! */}
+      <div className="flex gap-4 rounded-lg bg-pink-50 p-3">
+        <label className="block flex-1">
+          <span className="text-sm">
+            복용횟수 <span className="text-pink-500">*</span>
+          </span>
           <input
-            type="checkbox"
-            checked={form.menstruating}
-            onChange={(e) => update("menstruating", e.target.checked)}
+            type="number"
+            min={1}
+            required
+            value={form.dose_count ?? ""}
+            onChange={(e) => update("dose_count", e.target.value ? Number(e.target.value) : null)}
+            className="mt-1 w-full rounded-lg border p-2"
           />
-          <span className="text-sm">생리기간</span>
         </label>
-        <label className="flex items-center gap-2">
+        <label className="flex items-center gap-2 pt-5">
           <input
             type="checkbox"
-            checked={form.took_painkiller}
-            onChange={(e) => update("took_painkiller", e.target.checked)}
+            checked={form.effective === true}
+            onChange={(e) => update("effective", e.target.checked)}
           />
-          <span className="text-sm">통증약 복용</span>
+          <span className="text-sm">효과 있었음</span>
         </label>
       </div>
-
-      {/* 약을 먹었을 때만 보이는 부분 (조건부 렌더링!) */}
-      {form.took_painkiller && (
-        <div className="flex gap-4 rounded-lg bg-pink-50 p-3">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.effective === true}
-              onChange={(e) => update("effective", e.target.checked)}
-            />
-            <span className="text-sm">효과 있었음</span>
-          </label>
-          <label className="block flex-1">
-            <span className="text-sm">복용횟수</span>
-            <input
-              type="number"
-              min={1}
-              value={form.dose_count ?? ""}
-              onChange={(e) => update("dose_count", e.target.value ? Number(e.target.value) : null)}
-              className="mt-1 w-full rounded-lg border p-2"
-            />
-          </label>
-        </div>
-      )}
 
       {/* 촉발요인 */}
       <label className="block">
@@ -134,8 +131,18 @@ export default function EntryForm({ onSaved }: Props) {
         />
       </label>
 
-      {/* 혈압 3종 */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* 혈압 — 잰 날만 체크해서 기록! (조건부 렌더링) */}
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={recordBp}
+          onChange={(e) => setRecordBp(e.target.checked)}
+        />
+        <span className="text-sm">혈압도 기록하기 🩺</span>
+      </label>
+
+      {recordBp && (
+      <div className="grid grid-cols-3 gap-3 rounded-lg bg-pink-50 p-3">
         <label className="block">
           <span className="text-sm">수축기</span>
           <input
@@ -167,6 +174,7 @@ export default function EntryForm({ onSaved }: Props) {
           />
         </label>
       </div>
+      )}
 
       {/* 저장 버튼 */}
       <button

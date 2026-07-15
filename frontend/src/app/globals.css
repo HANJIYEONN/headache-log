@@ -15,6 +15,13 @@
 
 /* 다크모드여도 앱은 항상 연한 민트 톤을 유지해요 */
 
+html {
+  /* 탭마다 내용 길이가 달라도 화면 폭이 흔들리지 않게,
+     세로 스크롤 공간을 항상 확보해요 (모든 브라우저에서 동작하는 방법) */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

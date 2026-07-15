@@ -62,12 +62,18 @@ export default function Home() {
     load();
   }
 
+  // 지금까지 쓴 약 이름들 (중복 제거) — 자동완성 목록으로 폼에 넘겨요
+  // Set은 "같은 값은 한 번만 담는 주머니"예요
+  const medications = Array.from(
+    new Set(entries.map((e) => e.medication).filter((m): m is string => m !== null))
+  );
+
   return (
     <main className="mx-auto max-w-2xl space-y-8 p-6">
       <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
 
       {/* 입력 폼 — 저장이 끝나면 목록 새로고침, editing이 있으면 수정 모드 */}
-      <EntryForm onSaved={handleSaved} editing={editing} onCancelEdit={() => setEditing(null)} />
+      <EntryForm onSaved={handleSaved} editing={editing} onCancelEdit={() => setEditing(null)} medications={medications} />
 
       {/* 3탭: 목록 / 달력 / 차트 */}
       <section className="space-y-4">

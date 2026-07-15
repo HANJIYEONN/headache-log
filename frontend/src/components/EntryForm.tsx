@@ -16,6 +16,7 @@ type Props = {
   onSaved: () => void;
   editing: Entry | null;      // 수정 중인 기록 (없으면 null)
   onCancelEdit: () => void;   // 수정 취소할 때 부모에게 알리기
+  medications: string[];      // 지금까지 입력한 약 이름들 (자동완성 목록용)
 };
 
 // 폼의 초기값 (오늘 날짜로 시작)
@@ -26,7 +27,7 @@ function emptyForm(): NewEntry {
     took_painkiller: true, // 통증약은 항상 복용하니까 늘 true!
     medication: null,
     effective: false,
-    dose_count: null,
+    dose_count: 1, // 보통 1회니까 기본값으로!
     trigger: null,
     bp_systolic: null,
     bp_diastolic: null,
@@ -34,7 +35,7 @@ function emptyForm(): NewEntry {
   };
 }
 
-export default function EntryForm({ onSaved, editing, onCancelEdit }: Props) {
+export default function EntryForm({ onSaved, editing, onCancelEdit, medications }: Props) {
   // ── state : 컴포넌트가 "기억하는 값" ──
   // form 값이 바뀔 때마다 React가 화면을 자동으로 다시 그려줘요 ✨
   const [form, setForm] = useState<NewEntry>(emptyForm());
@@ -113,12 +114,19 @@ export default function EntryForm({ onSaved, editing, onCancelEdit }: Props) {
         </span>
         <input
           type="text"
-          placeholder="예: 타이레놀, 게보린..."
           required
+          list="medication-options"
           value={form.medication ?? ""}
           onChange={(e) => update("medication", e.target.value || null)}
           className="mt-1 w-full rounded-lg border p-2"
         />
+        {/* datalist : 입력칸을 클릭하면 이전에 쓴 약들이 선택지로 떠요.
+            새 약 이름도 그냥 타이핑하면 되고, 저장되면 다음부터 목록에 나와요! */}
+        <datalist id="medication-options">
+          {medications.map((med) => (
+            <option key={med} value={med} />
+          ))}
+        </datalist>
       </label>
 
       {/* 투약 정보 — 통증약은 항상 복용하니까 늘 보여주고, 복용횟수는 필수! */}

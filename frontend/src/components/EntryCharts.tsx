@@ -19,11 +19,7 @@ export default function EntryCharts({ entries }: Props) {
     return <p className="text-sm text-gray-500">기록이 쌓이면 통계를 보여드릴게요!</p>;
   }
 
-  // ── 1. 약 효과율: 효과 있음 / 전체 ──
-  const effectiveCount = entries.filter((e) => e.effective).length;
-  const effectiveRate = Math.round((effectiveCount / entries.length) * 100);
-
-  // ── 2. 월별 두통 횟수: { "2026-07": 3, ... } ──
+  // ── 1. 월별 두통 횟수: { "2026-07": 3, ... } ──
   const byMonth: Record<string, number> = {};
   for (const e of entries) {
     const month = e.entry_date.slice(0, 7); // "2026-07-15" → "2026-07"
@@ -32,7 +28,13 @@ export default function EntryCharts({ entries }: Props) {
   const months = Object.keys(byMonth).sort(); // 오래된 달부터
   const maxMonthly = Math.max(...months.map((m) => byMonth[m]));
 
-  // ── 3. 촉발요인 분포: 많이 나온 순으로 위에서부터 ──
+  // 세로축 눈금 만들기: 0부터 최댓값까지 (값이 크면 4~5칸으로 나눠요)
+  const step = Math.max(1, Math.ceil(maxMonthly / 4)); // 눈금 간격
+  const axisMax = step * Math.ceil(maxMonthly / step);  // 눈금의 꼭대기 값
+  const ticks: number[] = [];
+  for (let t = 0; t <= axisMax; t += step) ticks.push(t); // [0, 1, 2, ...]
+
+  // ── 2. 촉발요인 분포: 많이 나온 순으로 위에서부터 ──
   const byTrigger: Record<string, number> = {};
   for (const e of entries) {
     if (!e.trigger) continue;
@@ -43,40 +45,51 @@ export default function EntryCharts({ entries }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* 통계 카드 3장: 헤드라인 숫자는 차트보다 숫자가 더 잘 전달돼요 */}
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-          <p className="text-2xl font-bold text-[#1f4d44]">{entries.length}</p>
-          <p className="text-xs text-gray-500">전체 기록</p>
-        </div>
-        <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-          <p className="text-2xl font-bold text-[#1f4d44]">{effectiveRate}%</p>
-          <p className="text-xs text-gray-500">약 효과율</p>
-        </div>
-        <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-          <p className="text-2xl font-bold text-[#1f4d44]">
-            {byMonth[months[months.length - 1]]}
-          </p>
-          <p className="text-xs text-gray-500">이번 달 두통</p>
-        </div>
-      </div>
-
-      {/* 월별 두통 횟수 — 세로 막대 */}
+      {/* 월별 두통 횟수 — 세로 막대 + 세로축 눈금 */}
       <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
         <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">월별 두통 횟수</h3>
-        <div className="flex h-32 items-end gap-2">
-          {months.map((m) => (
-            // h-full + justify-end : 기둥이 컨테이너 높이를 갖고, 내용을 바닥에 붙여요
-            // (% 높이는 부모 높이가 정해져 있어야 계산돼요 — 없으면 0이 됨!)
-            <div key={m} className="flex h-full flex-1 flex-col items-center justify-end gap-1" title={`${m}: ${byMonth[m]}회`}>
-              <span className="text-xs text-gray-600">{byMonth[m]}</span>
-              {/* 높이 = 값/최댓값 비율 → 제일 큰 달이 75%(라벨 공간 확보) */}
+        <div className="flex gap-2">
+          {/* 세로축(y축) 숫자 — bottom %로 눈금 위치에 딱 맞춰요 */}
+          <div className="relative h-32 w-5">
+            {ticks.map((t) => (
+              <span
+                key={t}
+                className="absolute right-0 translate-y-1/2 text-[10px] text-gray-500"
+                style={{ bottom: `${(t / axisMax) * 100}%` }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          {/* 그래프 영역 */}
+          <div className="relative h-32 flex-1">
+            {/* 가로 눈금선 — 눈금 숫자와 같은 높이에 옅은 선 */}
+            {ticks.map((t) => (
               <div
-                className="w-full max-w-10 rounded-t"
-                style={{ height: `${(byMonth[m] / maxMonthly) * 75}%`, backgroundColor: BAR }}
+                key={t}
+                className="absolute w-full border-t border-gray-200"
+                style={{ bottom: `${(t / axisMax) * 100}%` }}
               />
-              <span className="text-xs text-gray-500">{m.slice(2).replace("-", ".")}</span>
+            ))}
+            {/* 막대들 — 눈금선 위에 겹쳐 그려요 */}
+            <div className="absolute inset-0 flex items-end gap-2">
+              {months.map((m) => (
+                <div key={m} className="flex h-full flex-1 items-end justify-center" title={`${m}: ${byMonth[m]}회`}>
+                  <div
+                    className="w-full max-w-10 rounded-t"
+                    style={{ height: `${(byMonth[m] / axisMax) * 100}%`, backgroundColor: BAR }}
+                  />
+                </div>
+              ))}
             </div>
+          </div>
+        </div>
+        {/* 월 라벨 줄 (그래프 영역과 같은 배치로 아래에) */}
+        <div className="ml-7 flex gap-2">
+          {months.map((m) => (
+            <span key={m} className="flex-1 text-center text-xs text-gray-500">
+              {m.slice(2).replace("-", ".")}
+            </span>
           ))}
         </div>
       </div>

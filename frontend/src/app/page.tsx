@@ -69,7 +69,8 @@ export default function Home() {
   );
 
   return (
-    <main className="mx-auto max-w-2xl space-y-8 p-6">
+    // w-full : flex 부모 안에서 내용 크기에 따라 줄어들지 않고 항상 최대 폭 유지
+    <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
       <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
 
       {/* 입력 폼 — 저장이 끝나면 목록 새로고침, editing이 있으면 수정 모드 */}

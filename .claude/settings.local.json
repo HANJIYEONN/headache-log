@@ -18,7 +18,16 @@
       "Bash(git commit -q -m 'UI 조정: 민트\\(teal\\) 색상으로 변경, 이모지 제거, 생리기간 위치 이동 *)",
       "Bash(git push *)",
       "Bash(git commit -q -m '색상 톤 조정: 민트색을 한 단계 연하게 \\(teal 600→500, 500→400, 200→100\\) *)",
-      "Bash(git commit -q -m '연한 파스텔 민트 테마 적용: 배경·버튼·제목 전체 톤 교체 *)"
+      "Bash(git commit -q -m '연한 파스텔 민트 테마 적용: 배경·버튼·제목 전체 톤 교체 *)",
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/psql -d headache_log -c \"ALTER TABLE headache_entries ADD COLUMN medication varchar\\(100\\);\")",
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/psql -d headache_log -c \"\\\\d headache_entries\")",
+      "Bash(pkill -f \"uvicorn app.main:app\")",
+      "Bash(nohup .venv/bin/uvicorn app.main:app --port 8000)",
+      "Bash(curl -s http://localhost:8000/health)",
+      "Bash(curl -s http://localhost:8000/entries)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -X DELETE http://localhost:8000/entries/16 -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(git commit -q -m '기록 항목에 약 종류\\(medication\\) 추가 *)"
     ]
   }
 }

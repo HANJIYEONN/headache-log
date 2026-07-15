@@ -54,6 +54,7 @@ workSpace/
 | `entry_date` | date | 날짜 | 필수 |
 | `menstruating` | boolean | 생리기간 유무 | 기본 false |
 | `took_painkiller` | boolean | 통증약 복용여부 | 항상 true (통증약은 늘 복용) |
+| `medication` | varchar | 약 종류 | 폼에서 필수 입력 (2026-07-15 추가) |
 | `effective` | boolean | 효과여부 | 약 안 먹으면 비움(null) |
 | `dose_count` | integer | 복용횟수 | null 허용 |
 | `trigger` | text | 촉발요인 | 자유 입력 |

@@ -22,6 +22,7 @@ function emptyForm(): NewEntry {
     entry_date: new Date().toISOString().slice(0, 10), // "2026-07-14" 형태
     menstruating: false,
     took_painkiller: true, // 통증약은 항상 복용하니까 늘 true!
+    medication: null,
     effective: false,
     dose_count: null,
     trigger: null,
@@ -81,6 +82,21 @@ export default function EntryForm({ onSaved }: Props) {
           onChange={(e) => update("entry_date", e.target.value)}
           className="mt-1 w-full rounded-lg border p-2"
           required
+        />
+      </label>
+
+      {/* 약 종류 */}
+      <label className="block">
+        <span className="text-sm font-medium">
+          약 종류 <span className="text-[#6cbfae]">*</span>
+        </span>
+        <input
+          type="text"
+          placeholder="예: 타이레놀, 게보린..."
+          required
+          value={form.medication ?? ""}
+          onChange={(e) => update("medication", e.target.value || null)}
+          className="mt-1 w-full rounded-lg border p-2"
         />
       </label>
 

@@ -25,6 +25,7 @@ export default function EntryTable({ entries, onDelete }: Props) {
         <thead>
           <tr className="border-b border-[#d4efe8] bg-[#eef8f5] text-left text-[#1f4d44]">
             <th className="p-3 font-semibold">날짜</th>
+            <th className="p-3 font-semibold">약 종류</th>
             <th className="p-3 font-semibold">복용횟수</th>
             <th className="p-3 font-semibold">효과</th>
             <th className="p-3 font-semibold">촉발요인</th>
@@ -38,6 +39,7 @@ export default function EntryTable({ entries, onDelete }: Props) {
           {entries.map((entry) => (
             <tr key={entry.id} className="border-b border-[#eef8f5] last:border-0">
               <td className="p-3 font-medium">{entry.entry_date}</td>
+              <td className="p-3">{entry.medication ?? "-"}</td>
               <td className="p-3">{entry.dose_count ?? "-"}회</td>
               <td className="p-3">{entry.effective ? "있음" : "없음"}</td>
               <td className="p-3">{entry.trigger ?? "-"}</td>

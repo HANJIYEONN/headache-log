@@ -8,6 +8,7 @@ class EntryBase(BaseModel):
     entry_date: date
     menstruating: bool = False
     took_painkiller: bool = True  # 통증약은 항상 복용
+    medication: Optional[str] = None  # 약 종류
     effective: Optional[bool] = None
     dose_count: Optional[int] = None
     trigger: Optional[str] = None

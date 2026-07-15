@@ -15,6 +15,7 @@ class HeadacheEntry(Base):
     entry_date: Mapped[date] = mapped_column(Date, nullable=False)  # 날짜
     menstruating: Mapped[bool] = mapped_column(Boolean, default=False)  # 생리기간 유무
     took_painkiller: Mapped[bool] = mapped_column(Boolean, default=False)  # 통증약 복용여부
+    medication: Mapped[str] = mapped_column(String(100), nullable=True)  # 약 종류
     effective: Mapped[bool] = mapped_column(Boolean, nullable=True)  # 효과여부
     dose_count: Mapped[int] = mapped_column(Integer, nullable=True)  # 복용횟수
     trigger: Mapped[str] = mapped_column(Text, nullable=True)  # 촉발요인

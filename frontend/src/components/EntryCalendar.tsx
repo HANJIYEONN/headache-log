@@ -110,7 +110,7 @@ export default function EntryCalendar({ entries }: Props) {
           ) : (
             selectedEntries.map((e) => (
               <p key={e.id} className="text-gray-700">
-                약 {e.dose_count ?? "-"}회 · 효과 {e.effective ? "있음" : "없음"}
+                {e.medication ?? "약"} {e.dose_count ?? "-"}회 · 효과 {e.effective ? "있음" : "없음"}
                 {e.trigger && ` · ${e.trigger}`}
                 {e.menstruating && " · 생리기간"}
                 {e.bp_systolic && ` · 혈압 ${e.bp_systolic}/${e.bp_diastolic}`}

@@ -14,6 +14,7 @@ export type Entry = {
   entry_date: string;        // 날짜 (예: "2026-07-14")
   menstruating: boolean;     // 생리기간 유무 (true/false)
   took_painkiller: boolean;  // 통증약 복용여부
+  medication: string | null; // 약 종류
   effective: boolean | null; // 효과여부 (약 안 먹었으면 null = "비어있음")
   dose_count: number | null; // 복용횟수
   trigger: string | null;    // 촉발요인

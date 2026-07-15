@@ -10,9 +10,10 @@ import type { Entry } from "@/lib/api";
 type Props = {
   entries: Entry[];
   onDelete: (id: number) => void;
+  onEdit: (entry: Entry) => void; // 수정 버튼을 누르면 부모에게 알려줘요
 };
 
-export default function EntryTable({ entries, onDelete }: Props) {
+export default function EntryTable({ entries, onDelete, onEdit }: Props) {
   if (entries.length === 0) {
     return <p className="text-sm text-gray-500">아직 기록이 없어요. 첫 기록을 남겨보세요!</p>;
   }
@@ -50,6 +51,12 @@ export default function EntryTable({ entries, onDelete }: Props) {
                   : "-"}
               </td>
               <td className="p-3 text-right">
+                <button
+                  onClick={() => onEdit(entry)}
+                  className="mr-2 text-xs text-gray-400 hover:text-[#178f76]"
+                >
+                  수정
+                </button>
                 <button
                   onClick={() => onDelete(entry.id)}
                   className="text-xs text-gray-400 hover:text-red-500"

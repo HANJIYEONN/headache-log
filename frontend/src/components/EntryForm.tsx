@@ -7,13 +7,15 @@
 // 컴포넌트 = 화면 조각을 만드는 함수 (레고 블록 같은 것 🧱)
 // ─────────────────────────────────────────────
 
-import { useState } from "react";
-import { createEntry, type NewEntry } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { createEntry, updateEntry, type Entry, type NewEntry } from "@/lib/api";
 
 // props = 부모 컴포넌트가 넘겨주는 값
-// 여기선 "저장 성공하면 알려줘!" 라는 함수를 받아요
+// editing이 있으면 "새 기록"이 아니라 "그 기록을 고치는 중"이에요
 type Props = {
   onSaved: () => void;
+  editing: Entry | null;      // 수정 중인 기록 (없으면 null)
+  onCancelEdit: () => void;   // 수정 취소할 때 부모에게 알리기
 };
 
 // 폼의 초기값 (오늘 날짜로 시작)
@@ -32,13 +34,26 @@ function emptyForm(): NewEntry {
   };
 }
 
-export default function EntryForm({ onSaved }: Props) {
+export default function EntryForm({ onSaved, editing, onCancelEdit }: Props) {
   // ── state : 컴포넌트가 "기억하는 값" ──
   // form 값이 바뀔 때마다 React가 화면을 자동으로 다시 그려줘요 ✨
   const [form, setForm] = useState<NewEntry>(emptyForm());
   const [saving, setSaving] = useState(false); // 저장 중인지
   const [message, setMessage] = useState("");  // 안내 문구
   const [recordBp, setRecordBp] = useState(false); // 혈압도 기록할지 여부
+
+  // 수정할 기록이 정해지면 그 값들을 폼에 채워넣어요
+  useEffect(() => {
+    if (editing) {
+      const { id: _id, ...rest } = editing; // id는 폼에 필요 없으니 빼고
+      setForm(rest);
+      setRecordBp(editing.bp_systolic !== null); // 혈압 있던 기록이면 혈압칸 열기
+      setMessage("");
+    } else {
+      setForm(emptyForm());
+      setRecordBp(false);
+    }
+  }, [editing]);
 
   // form에서 한 칸만 바꾸는 도우미 함수
   // 예: update("dose_count", 2) → 복용횟수만 2로 변경
@@ -56,10 +71,14 @@ export default function EntryForm({ onSaved }: Props) {
       const payload = recordBp
         ? form
         : { ...form, bp_systolic: null, bp_diastolic: null, bp_pulse: null };
-      await createEntry(payload); // 백엔드에 저장 요청 📤
+      if (editing) {
+        await updateEntry(editing.id, payload); // 수정 모드면 PUT
+      } else {
+        await createEntry(payload);             // 아니면 새로 저장 (POST)
+      }
       setForm(emptyForm());       // 폼 비우기
       setRecordBp(false);
-      setMessage("저장했어요!");
+      setMessage(editing ? "수정했어요!" : "저장했어요!");
       onSaved();                 // 부모에게 "저장했어!" 알리기
     } catch {
       setMessage("저장에 실패했어요. 백엔드가 켜져 있는지 확인해주세요.");
@@ -71,7 +90,9 @@ export default function EntryForm({ onSaved }: Props) {
   // ── 화면(JSX) : HTML처럼 생겼지만 { } 안에 자바스크립트를 쓸 수 있어요 ──
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#d4efe8] bg-white p-6 text-gray-900 shadow-sm">
-      <h2 className="text-lg font-bold text-[#48a08e]">오늘의 두통 기록</h2>
+      <h2 className="text-lg font-bold text-[#48a08e]">
+        {editing ? `기록 수정 (${editing.entry_date})` : "오늘의 두통 기록"}
+      </h2>
 
       {/* 날짜 */}
       <label className="block">
@@ -192,14 +213,25 @@ export default function EntryForm({ onSaved }: Props) {
         <span className="text-sm">생리기간</span>
       </label>
 
-      {/* 저장 버튼 */}
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
-      >
-        {saving ? "저장 중..." : "기록 저장하기"}
-      </button>
+      {/* 저장/취소 버튼 */}
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex-1 rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
+        >
+          {saving ? "저장 중..." : editing ? "수정 저장하기" : "기록 저장하기"}
+        </button>
+        {editing && (
+          <button
+            type="button"
+            onClick={onCancelEdit}
+            className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
+          >
+            취소
+          </button>
+        )}
+      </div>
 
       {/* 안내 메시지 (있을 때만 표시) */}
       {message && <p className="text-center text-sm">{message}</p>}

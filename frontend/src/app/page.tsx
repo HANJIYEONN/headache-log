@@ -27,6 +27,8 @@ export default function Home() {
   const [entries, setEntries] = useState<Entry[]>([]);
   // 지금 열려 있는 탭
   const [tab, setTab] = useState<Tab>("list");
+  // 수정 중인 기록 (null이면 새 기록 모드)
+  const [editing, setEditing] = useState<Entry | null>(null);
 
   // 백엔드에서 목록을 불러오는 함수
   const load = useCallback(async () => {
@@ -48,12 +50,24 @@ export default function Home() {
     load(); // 삭제 후 목록 다시 불러오기
   }
 
+  // 수정 버튼 처리: 그 기록을 폼에 싣고 맨 위로 스크롤
+  function handleEdit(entry: Entry) {
+    setEditing(entry);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // 저장(새 기록/수정)이 끝나면: 수정 모드 해제 + 목록 새로고침
+  function handleSaved() {
+    setEditing(null);
+    load();
+  }
+
   return (
     <main className="mx-auto max-w-2xl space-y-8 p-6">
       <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
 
-      {/* 입력 폼 — 저장이 끝나면 onSaved로 load()가 실행돼서 목록이 새로고침돼요 */}
-      <EntryForm onSaved={load} />
+      {/* 입력 폼 — 저장이 끝나면 목록 새로고침, editing이 있으면 수정 모드 */}
+      <EntryForm onSaved={handleSaved} editing={editing} onCancelEdit={() => setEditing(null)} />
 
       {/* 3탭: 목록 / 달력 / 차트 */}
       <section className="space-y-4">
@@ -75,7 +89,7 @@ export default function Home() {
         </div>
 
         {/* 선택된 탭에 맞는 컴포넌트만 렌더링 (조건부 렌더링 또 등장!) */}
-        {tab === "list" && <EntryTable entries={entries} onDelete={handleDelete} />}
+        {tab === "list" && <EntryTable entries={entries} onDelete={handleDelete} onEdit={handleEdit} />}
         {tab === "calendar" && <EntryCalendar entries={entries} />}
         {tab === "chart" && <EntryCharts entries={entries} />}
       </section>

@@ -45,6 +45,17 @@ export async function createEntry(entry: NewEntry): Promise<Entry> {
   return res.json();
 }
 
+// ── 기록 수정하기 (PUT) ──
+export async function updateEntry(id: number, entry: NewEntry): Promise<Entry> {
+  const res = await fetch(`${API_URL}/entries/${id}`, {
+    method: "PUT", // "이 기록을 이 내용으로 바꿔줘"
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) throw new Error("수정에 실패했어요");
+  return res.json();
+}
+
 // ── 기록 삭제하기 (DELETE) ──
 export async function deleteEntry(id: number): Promise<void> {
   const res = await fetch(`${API_URL}/entries/${id}`, { method: "DELETE" });

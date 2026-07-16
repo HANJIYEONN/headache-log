@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import entries
+from .routers import entries, auth
 
 app = FastAPI(title="두통 기록 차트 API")
 
@@ -17,6 +17,7 @@ app.add_middleware(
 
 app.include_router(entries.router)
 
+app.include_router(auth.router)
 
 @app.on_event("startup")
 def on_startup() -> None:

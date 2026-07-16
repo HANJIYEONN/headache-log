@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import BrainIcon from '@/components/BrainIcon';
+import GoogleGIcon from '@/components/GoogleGIcon';
+
+const BUTTON_WIDTH = 280; // 커스텀 버튼과 실제 구글 버튼의 폭을 똑같이 맞춰요
 
 export default function LoginPage() {
   const [error, setError] = useState('');
@@ -58,12 +61,25 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
         </div>
 
-        {/* 구글 버튼을 가운데 두기 위한 감싸개 */}
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleSuccess}
-            onError={() => setError('구글 로그인에 실패했어요. 다시 시도해주세요.')}
-          />
+        {/* 구글 로그인 버튼 — 기본 버튼이 못생겨서, 예쁜 버튼을 위에 그리고
+            "진짜 구글 버튼"은 투명하게 만들어 그 위에 그대로 겹쳐놨어요.
+            눈에는 우리 버튼이 보이지만, 클릭은 진짜 구글 버튼이 받아서 처리해요. */}
+        <div className="relative mx-auto" style={{ width: BUTTON_WIDTH }}>
+          <button
+            type="button"
+            tabIndex={-1}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4efe8] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#eef8f5]"
+          >
+            <GoogleGIcon />
+            Google 계정으로 로그인
+          </button>
+          <div className="absolute inset-0 overflow-hidden rounded-xl opacity-0">
+            <GoogleLogin
+              onSuccess={handleSuccess}
+              onError={() => setError('구글 로그인에 실패했어요. 다시 시도해주세요.')}
+              width={BUTTON_WIDTH}
+            />
+          </div>
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

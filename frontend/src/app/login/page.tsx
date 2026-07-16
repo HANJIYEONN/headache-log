@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginPage() {
+  const [error, setError] = useState('');
+
   // 이미 로그인한 상태면 메인으로 보내요
   useEffect(() => {
     if (localStorage.getItem('access_token')) {
@@ -15,12 +17,12 @@ export default function LoginPage() {
     const idToken = credentialResponse.credential; // 구글이 준 ID 토큰
 
     if (!idToken) {
-      console.error("구글 토큰이 없습니다.");
+      setError('구글 로그인에 실패했어요. 다시 시도해주세요.');
       return;
     }
 
     try {
-      // 🚀 백엔드 FastAPI로 ID 토큰 전송
+      // 백엔드 FastAPI로 ID 토큰 전송
       const response = await fetch('http://localhost:8000/api/v1/auth/google', {
         method: 'POST',
         headers: {
@@ -31,27 +33,37 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json();
-        // 백엔드에서 발급해 준 자체 JWT 토큰 저장 (예: localStorage 또는 쿠키)
+        // 백엔드에서 발급해 준 자체 JWT 토큰 저장
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.user));
         window.location.href = '/'; // 로그인 성공 → 메인 페이지로 이동
       } else {
-        alert('백엔드 검증 실패');
+        setError('로그인 확인에 실패했어요. 잠시 후 다시 시도해주세요.');
       }
     } catch (error) {
-      console.error('로그인 에러:', error);
+      setError('서버에 연결하지 못했어요. 백엔드가 켜져 있는지 확인해주세요.');
     }
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
-      <h2>구글 로그인 테스트</h2>
-      <GoogleLogin
-        onSuccess={handleSuccess}
-        onError={() => {
-          console.log('Login Failed');
-        }}
-      />
-    </div>
+    <main className="flex min-h-screen w-full items-center justify-center p-6">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#d4efe8] bg-white p-8 text-center shadow-sm">
+        <div className="space-y-1">
+          <p className="text-3xl">🩷</p>
+          <h1 className="text-xl font-bold text-[#48a08e]">두통 기록 차트</h1>
+          <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
+        </div>
+
+        {/* 구글 버튼을 가운데 두기 위한 감싸개 */}
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleSuccess}
+            onError={() => setError('구글 로그인에 실패했어요. 다시 시도해주세요.')}
+          />
+        </div>
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
+      </div>
+    </main>
   );
 }

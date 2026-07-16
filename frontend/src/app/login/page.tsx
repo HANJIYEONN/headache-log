@@ -1,8 +1,16 @@
 'use client';
 
+import { useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginPage() {
+  // 이미 로그인한 상태면 메인으로 보내요
+  useEffect(() => {
+    if (localStorage.getItem('access_token')) {
+      window.location.href = '/';
+    }
+  }, []);
+
   const handleSuccess = async (credentialResponse: any) => {
     const idToken = credentialResponse.credential; // 구글이 준 ID 토큰
 

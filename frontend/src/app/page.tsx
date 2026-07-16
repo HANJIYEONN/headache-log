@@ -29,6 +29,26 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("list");
   // 수정 중인 기록 (null이면 새 기록 모드)
   const [editing, setEditing] = useState<Entry | null>(null);
+  // 로그인한 사용자 이름 (로그인 확인이 끝나야 화면을 보여줘요)
+  const [userName, setUserName] = useState<string | null>(null);
+
+  // 페이지 열리자마자 로그인했는지 검사 — 안 했으면 로그인 페이지로!
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+    const user = localStorage.getItem("user");
+    setUserName(user ? JSON.parse(user).name : "사용자");
+  }, []);
+
+  // 로그아웃: 저장한 토큰을 지우고 로그인 페이지로
+  function handleLogout() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
 
   // 백엔드에서 목록을 불러오는 함수
   const load = useCallback(async () => {
@@ -68,10 +88,24 @@ export default function Home() {
     new Set(entries.map((e) => e.medication).filter((m): m is string => m !== null))
   );
 
+  // 로그인 확인이 끝나기 전엔 아무것도 안 보여줘요 (화면 깜빡임 방지)
+  if (userName === null) return null;
+
   return (
     // w-full : flex 부모 안에서 내용 크기에 따라 줄어들지 않고 항상 최대 폭 유지
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
-      <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-gray-600">{userName}님</span>
+          <button
+            onClick={handleLogout}
+            className="rounded-lg border border-[#d4efe8] bg-white px-3 py-1 text-gray-500 hover:bg-[#eef8f5]"
+          >
+            로그아웃
+          </button>
+        </div>
+      </div>
 
       {/* 입력 폼 — 저장이 끝나면 목록 새로고침, editing이 있으면 수정 모드 */}
       <EntryForm onSaved={handleSaved} editing={editing} onCancelEdit={() => setEditing(null)} medications={medications} />

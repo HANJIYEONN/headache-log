@@ -27,9 +27,27 @@ export type Entry = {
 // Omit<Entry, "id"> = "Entry에서 id만 뺀 모양"
 export type NewEntry = Omit<Entry, "id">;
 
+// ── 로그인 토큰을 요청에 붙여주는 도우미 ──
+// 로그인하면 localStorage에 access_token이 저장돼 있어요.
+// 모든 요청에 "Authorization: Bearer 토큰" 명찰을 달아서 보내요.
+function authHeaders(): Record<string, string> {
+  const token = localStorage.getItem("access_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// 401(로그인 안 됨/만료) 응답이면 로그인 페이지로 보내요
+function checkAuth(res: Response) {
+  if (res.status === 401) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
+}
+
 // ── 기록 목록 가져오기 (GET) ──
 export async function fetchEntries(): Promise<Entry[]> {
-  const res = await fetch(`${API_URL}/entries`);
+  const res = await fetch(`${API_URL}/entries`, { headers: authHeaders() });
+  checkAuth(res);
   if (!res.ok) throw new Error("기록을 불러오지 못했어요");
   return res.json(); // 응답을 JSON(자바스크립트 객체)으로 변환
 }
@@ -38,9 +56,10 @@ export async function fetchEntries(): Promise<Entry[]> {
 export async function createEntry(entry: NewEntry): Promise<Entry> {
   const res = await fetch(`${API_URL}/entries`, {
     method: "POST",                                  // "새로 만들어줘"
-    headers: { "Content-Type": "application/json" }, // "JSON으로 보낼게"
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(entry),                     // 객체 → JSON 문자열
   });
+  checkAuth(res);
   if (!res.ok) throw new Error("저장에 실패했어요");
   return res.json();
 }
@@ -49,15 +68,20 @@ export async function createEntry(entry: NewEntry): Promise<Entry> {
 export async function updateEntry(id: number, entry: NewEntry): Promise<Entry> {
   const res = await fetch(`${API_URL}/entries/${id}`, {
     method: "PUT", // "이 기록을 이 내용으로 바꿔줘"
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(entry),
   });
+  checkAuth(res);
   if (!res.ok) throw new Error("수정에 실패했어요");
   return res.json();
 }
 
 // ── 기록 삭제하기 (DELETE) ──
 export async function deleteEntry(id: number): Promise<void> {
-  const res = await fetch(`${API_URL}/entries/${id}`, { method: "DELETE" });
+  const res = await fetch(`${API_URL}/entries/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  checkAuth(res);
   if (!res.ok) throw new Error("삭제에 실패했어요");
 }

@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Header, HTTPException, status
 from pydantic import BaseModel
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -28,9 +28,27 @@ def create_access_token(data: dict, expires_delta: datetime.timedelta = None):
     if expires_delta:
         expire = datetime.datetime.utcnow() + expires_delta
     else:
-        expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=60) # 1시간 유효
+        expire = datetime.datetime.utcnow() + datetime.timedelta(hours=24) # 24시간 유효
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def get_current_user_email(authorization: str = Header(None)) -> str:
+    """요청 헤더의 JWT를 검증하고 사용자 이메일을 돌려주는 '문지기' 함수.
+
+    다른 API에서 Depends(get_current_user_email)로 붙이면
+    로그인한 사람만 통과할 수 있어요.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="로그인이 필요해요")
+    token = authorization.split(" ", 1)[1]
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="로그인이 만료됐어요. 다시 로그인해주세요")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="유효하지 않은 토큰이에요")
+    return payload["sub"]
 
 @router.post("/google")
 async def google_login(payload: TokenRequest):

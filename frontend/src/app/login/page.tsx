@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
+import BrainIcon from '@/components/BrainIcon';
 
 export default function LoginPage() {
   const [error, setError] = useState('');
@@ -48,8 +49,11 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#d4efe8] bg-white p-8 text-center shadow-sm">
-        <div className="space-y-1">
-          <p className="text-3xl">🩷</p>
+        <div className="space-y-2">
+          {/* 뇌 아이콘을 동그란 민트 배지 안에 가운데 정렬 */}
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#eef8f5] text-[#178f76]">
+            <BrainIcon className="h-8 w-8" />
+          </div>
           <h1 className="text-xl font-bold text-[#48a08e]">두통 기록 차트</h1>
           <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
         </div>

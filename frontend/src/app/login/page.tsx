@@ -26,8 +26,9 @@ export default function LoginPage() {
     }
 
     try {
-      // 백엔드 FastAPI로 ID 토큰 전송
-      const response = await fetch('http://localhost:8000/api/v1/auth/google', {
+      // 백엔드 FastAPI로 ID 토큰 전송 (배포 시 NEXT_PUBLIC_API_URL로 실제 주소 사용)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/v1/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

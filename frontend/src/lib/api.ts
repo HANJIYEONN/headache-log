@@ -4,7 +4,9 @@
 // ─────────────────────────────────────────────
 
 // 백엔드 서버 주소
-const API_URL = "http://localhost:8000";
+// 배포 시 Vercel에 NEXT_PUBLIC_API_URL 환경변수로 실제 서버 주소를 넣어줘요.
+// 로컬 개발 중엔 값이 없으니 localhost로 자동 대체돼요.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // ── 타입(type) : "기록 한 건은 이렇게 생겼다"는 설계도 ──
 // TypeScript는 데이터 모양을 미리 정해두면

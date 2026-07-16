@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,10 +8,14 @@ from .routers import entries, auth
 
 app = FastAPI(title="두통 기록 차트 API")
 
-# Next.js dev server
+# 로컬 개발 주소 + 배포된 Vercel 주소(FRONTEND_URL 환경변수)를 함께 허용해요
+allowed_origins = ["http://localhost:3000"]
+if frontend_url := os.getenv("FRONTEND_URL"):
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

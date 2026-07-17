@@ -1,15 +1,18 @@
-# 배포 가이드 — 오라클 클라우드(백엔드+DB) + Vercel(프론트)
+# 배포 가이드 — 오라클 클라우드(백엔드) + TiDB Cloud(DB) + Vercel(프론트)
 
 ## 전체 그림
 
 ```mermaid
 flowchart LR
     A["누나 브라우저"] -->|"HTTPS"| B["Vercel<br/>Next.js 프론트"]
-    B -->|"API 요청"| C["오라클 클라우드 VM<br/>nginx → FastAPI(Docker) → PostgreSQL(Docker)"]
+    B -->|"API 요청"| C["오라클 클라우드 VM<br/>nginx → FastAPI(Docker)"]
+    C -->|"MySQL 연결(SSL)"| D["TiDB Cloud<br/>(관리형 DB)"]
 ```
 
 - **프론트(Next.js)** → Vercel (무료, 자동 배포)
-- **백엔드(FastAPI) + DB(PostgreSQL)** → 오라클 클라우드 Always Free VM (Docker로 실행)
+- **백엔드(FastAPI)** → 오라클 클라우드 Always Free VM (Docker로 실행)
+- **DB** → TiDB Cloud (MySQL 호환, 관리형) — 서버에 직접 DB를 안 띄워서 관리가 편해요
+- 로컬 개발은 내 컴퓨터의 MySQL 사용 (TiDB와 같은 MySQL 방언이라 방언 차이 걱정 없음)
 
 ---
 
@@ -47,10 +50,15 @@ flowchart LR
 
 - [ ] Docker, Docker Compose, nginx 설치
 - [ ] 이 저장소를 서버로 clone
-- [ ] `backend/.env` 에 실제 값 채우기 (DB 비밀번호, GOOGLE_CLIENT_ID, JWT_SECRET, FRONTEND_URL)
-- [ ] `docker compose up -d --build` 로 백엔드+DB 실행
+- [ ] `backend/.env` 에 실제 값 채우기:
+      - `DATABASE_URL` = TiDB Cloud 연결 문자열 (TiDB 콘솔 → Connect, mysql+pymysql 형식 + SSL 옵션)
+      - `GOOGLE_CLIENT_ID`, `JWT_SECRET`, `FRONTEND_URL`
+- [ ] `docker compose up -d --build` 로 백엔드 실행 (DB는 TiDB Cloud라 컨테이너 없음)
 - [ ] nginx 설정 적용 (`deploy/nginx.conf` 참고) → 80번 포트로 API 노출
 - [ ] `curl http://<서버IP>/health` 로 정상 동작 확인
+
+> DB(TiDB Cloud)는 이미 만들어져 있으니, 서버에서는 백엔드만 띄우고 `DATABASE_URL`로 연결만 하면 돼요.
+> 테이블은 FastAPI가 처음 뜰 때 자동으로 만들어요 (`Base.metadata.create_all`).
 
 ## 3단계 — Vercel에 프론트 배포
 

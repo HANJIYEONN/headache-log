@@ -33,10 +33,16 @@ class EntryOut(EntryBase):
 
 class FavoriteMedicationCreate(BaseModel):
     name: str
+    menstruating: bool = False
+    effective: Optional[bool] = None
+    dose_count: Optional[int] = None
+    trigger: Optional[str] = None
+    bp_systolic: Optional[int] = None
+    bp_diastolic: Optional[int] = None
+    bp_pulse: Optional[int] = None
 
 
-class FavoriteMedicationOut(BaseModel):
+class FavoriteMedicationOut(FavoriteMedicationCreate):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    name: str

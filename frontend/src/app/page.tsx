@@ -15,6 +15,7 @@ import {
   fetchEntries,
   deleteEntry,
   fetchFavorites,
+  deleteFavorite,
   quickAddEntry,
   type Entry,
   type FavoriteMedication,
@@ -41,6 +42,8 @@ export default function Home() {
   // 즐겨찾기(자주 복용하는 약, 최대 3개)
   const [favorites, setFavorites] = useState<FavoriteMedication[]>([]);
   const [quickAddMessage, setQuickAddMessage] = useState("");
+  // 수정 중인 즐겨찾기 (null이면 아님)
+  const [editingFavorite, setEditingFavorite] = useState<FavoriteMedication | null>(null);
 
   // 페이지 열리자마자 로그인했는지 검사 — 안 했으면 로그인 페이지로!
   useEffect(() => {
@@ -84,12 +87,12 @@ export default function Home() {
     loadFavorites();
   }, [load, loadFavorites]);
 
-  // 즐겨찾기 버튼 클릭: 오늘 기록을 바로 완성해서 저장
-  async function handleQuickAdd(name: string) {
+  // 즐겨찾기 버튼 클릭: 저장해둔 내용 그대로 오늘 기록으로 완성해서 저장
+  async function handleQuickAdd(favorite: FavoriteMedication) {
     setQuickAddMessage("");
     try {
-      await quickAddEntry(name);
-      setQuickAddMessage(`${name} 기록을 오늘 목록에 추가했어요!`);
+      await quickAddEntry(favorite);
+      setQuickAddMessage(`${favorite.name} 기록을 오늘 목록에 추가했어요!`);
       load();
     } catch {
       setQuickAddMessage("추가에 실패했어요. 다시 시도해주세요.");
@@ -105,7 +108,26 @@ export default function Home() {
   // 수정 버튼 처리: 그 기록을 폼에 싣고 맨 위로 스크롤
   function handleEdit(entry: Entry) {
     setEditing(entry);
+    setEditingFavorite(null); // 두 가지 수정 모드가 겹치지 않게!
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // 즐겨찾기 수정 버튼: 그 내용을 폼에 싣고 맨 위로 스크롤
+  function handleEditFavorite(favorite: FavoriteMedication) {
+    setEditingFavorite(favorite);
+    setEditing(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // 즐겨찾기 삭제 버튼
+  async function handleDeleteFavorite(id: number) {
+    try {
+      await deleteFavorite(id);
+      if (editingFavorite?.id === id) setEditingFavorite(null);
+      loadFavorites();
+    } catch {
+      setQuickAddMessage("삭제에 실패했어요. 다시 시도해주세요.");
+    }
   }
 
   // 저장(새 기록/수정)이 끝나면: 수정 모드 해제 + 목록 새로고침
@@ -139,18 +161,35 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 즐겨찾기(자주 복용하는 약) 버튼 — 누르면 오늘 기록으로 바로 저장 */}
+      {/* 자주 복용하는 약 — 이름 누르면 오늘 기록으로 바로 저장, 수정/삭제 버튼 포함 */}
       {favorites.length > 0 && (
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
             {favorites.map((fav) => (
-              <button
+              <div
                 key={fav.id}
-                onClick={() => handleQuickAdd(fav.name)}
-                className="rounded-full border border-[#d4efe8] bg-white px-4 py-2 text-sm font-medium text-[#1f4d44] hover:bg-[#eef8f5]"
+                className="flex items-center overflow-hidden rounded-full border border-[#d4efe8] bg-white text-sm"
               >
-                ★ {fav.name} 복용
-              </button>
+                <button
+                  onClick={() => handleQuickAdd(fav)}
+                  title="누르면 오늘 복용 기록으로 저장돼요"
+                  className="px-4 py-2 font-medium text-[#1f4d44] hover:bg-[#eef8f5]"
+                >
+                  {fav.name} 복용
+                </button>
+                <button
+                  onClick={() => handleEditFavorite(fav)}
+                  className="border-l border-[#eef8f5] px-3 py-2 text-xs text-gray-400 hover:bg-[#eef8f5] hover:text-[#178f76]"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDeleteFavorite(fav.id)}
+                  className="border-l border-[#eef8f5] px-3 py-2 text-xs text-gray-400 hover:bg-[#eef8f5] hover:text-red-500"
+                >
+                  삭제
+                </button>
+              </div>
             ))}
           </div>
           {quickAddMessage && <p className="text-sm text-gray-500">{quickAddMessage}</p>}
@@ -165,6 +204,8 @@ export default function Home() {
         medications={medications}
         favorites={favorites}
         onFavoritesChanged={loadFavorites}
+        editingFavorite={editingFavorite}
+        onCancelFavoriteEdit={() => setEditingFavorite(null)}
       />
 
       {/* 3탭: 목록 / 달력 / 차트 */}

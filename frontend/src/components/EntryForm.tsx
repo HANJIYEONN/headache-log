@@ -12,10 +12,11 @@ import {
   createEntry,
   updateEntry,
   addFavorite,
-  deleteFavorite,
+  updateFavorite,
   type Entry,
   type FavoriteMedication,
   type NewEntry,
+  type NewFavorite,
 } from "@/lib/api";
 
 const MAX_FAVORITES = 3;
@@ -28,7 +29,9 @@ type Props = {
   onCancelEdit: () => void;   // 수정 취소할 때 부모에게 알리기
   medications: string[];      // 지금까지 입력한 약 이름들 (자동완성 목록용)
   favorites: FavoriteMedication[];  // 즐겨찾기(자주 복용하는 약) 목록
-  onFavoritesChanged: () => void;   // 즐겨찾기 추가/삭제 후 부모에게 새로고침 요청
+  onFavoritesChanged: () => void;   // 즐겨찾기가 바뀐 뒤 부모에게 새로고침 요청
+  editingFavorite: FavoriteMedication | null; // 수정 중인 즐겨찾기 (없으면 null)
+  onCancelFavoriteEdit: () => void;           // 즐겨찾기 수정 취소
 };
 
 // 폼의 초기값 (오늘 날짜로 시작)
@@ -54,6 +57,8 @@ export default function EntryForm({
   medications,
   favorites,
   onFavoritesChanged,
+  editingFavorite,
+  onCancelFavoriteEdit,
 }: Props) {
   // ── state : 컴포넌트가 "기억하는 값" ──
   // form 값이 바뀔 때마다 React가 화면을 자동으로 다시 그려줘요 ✨
@@ -75,32 +80,68 @@ export default function EntryForm({
     }
   }, [editing]);
 
+  // 수정할 즐겨찾기가 정해지면 그 내용을 폼에 채워넣어요
+  useEffect(() => {
+    if (editingFavorite) {
+      setForm({
+        ...emptyForm(), // 날짜는 오늘로
+        medication: editingFavorite.name,
+        menstruating: editingFavorite.menstruating,
+        effective: editingFavorite.effective,
+        dose_count: editingFavorite.dose_count,
+        trigger: editingFavorite.trigger,
+        bp_systolic: editingFavorite.bp_systolic,
+        bp_diastolic: editingFavorite.bp_diastolic,
+        bp_pulse: editingFavorite.bp_pulse,
+      });
+      setRecordBp(editingFavorite.bp_systolic !== null);
+      setMessage("");
+    }
+  }, [editingFavorite]);
+
   // form에서 한 칸만 바꾸는 도우미 함수
   // 예: update("dose_count", 2) → 복용횟수만 2로 변경
   function update<K extends keyof NewEntry>(key: K, value: NewEntry[K]) {
     setForm({ ...form, [key]: value }); // ...form = 기존 값 복사 후 한 칸만 덮어쓰기
   }
 
-  // 지금 입력한 약이 이미 즐겨찾기에 있는지 찾기 (있으면 그 항목, 없으면 undefined)
-  const currentMedication = form.medication?.trim();
-  const favoriteMatch = favorites.find((f) => f.name === currentMedication);
-
-  // 별 버튼을 눌렀을 때: 즐겨찾기에 있으면 빼고, 없으면 추가
-  async function toggleFavorite() {
-    if (!currentMedication) return;
+  // "자주 복용하는 약 저장하기/수정하기" 버튼: 지금 폼 내용 전체를 즐겨찾기로 저장
+  async function handleSaveFavorite() {
+    const name = form.medication?.trim();
+    if (!name) {
+      setMessage("약 종류를 먼저 입력해주세요");
+      return;
+    }
+    // 새로 추가하는 경우에만 3개 제한 검사 (수정은 개수가 안 늘어나니까!)
+    if (!editingFavorite && favorites.length >= MAX_FAVORITES) {
+      setMessage(`자주 복용하는 약은 최대 ${MAX_FAVORITES}개까지예요`);
+      return;
+    }
+    // 저장 버튼과 같은 규칙: 혈압 체크가 꺼져 있으면 혈압 값은 비워서 저장
+    const favorite: NewFavorite = {
+      name,
+      menstruating: form.menstruating,
+      effective: form.effective,
+      dose_count: form.dose_count,
+      trigger: form.trigger,
+      bp_systolic: recordBp ? form.bp_systolic : null,
+      bp_diastolic: recordBp ? form.bp_diastolic : null,
+      bp_pulse: recordBp ? form.bp_pulse : null,
+    };
     try {
-      if (favoriteMatch) {
-        await deleteFavorite(favoriteMatch.id);
+      if (editingFavorite) {
+        await updateFavorite(editingFavorite.id, favorite);
+        setMessage(`자주 복용하는 약 "${name}"을(를) 수정했어요!`);
+        onCancelFavoriteEdit(); // 수정 모드 끝내기
       } else {
-        if (favorites.length >= MAX_FAVORITES) {
-          setMessage(`즐겨찾기는 최대 ${MAX_FAVORITES}개까지예요`);
-          return;
-        }
-        await addFavorite(currentMedication);
+        await addFavorite(favorite);
+        setMessage(`자주 복용하는 약에 "${name}"을(를) 추가했어요!`);
       }
+      setForm(emptyForm());
+      setRecordBp(false);
       onFavoritesChanged(); // 부모에게 "즐겨찾기 목록 새로고침해줘" 알리기
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "즐겨찾기 처리에 실패했어요");
+      setMessage(err instanceof Error ? err.message : "즐겨찾기 저장에 실패했어요");
     }
   }
 
@@ -134,7 +175,11 @@ export default function EntryForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#d4efe8] bg-white p-6 text-gray-900 shadow-sm">
       <h2 className="text-lg font-bold text-[#48a08e]">
-        {editing ? `기록 수정 (${editing.entry_date})` : "오늘의 두통 기록"}
+        {editing
+          ? `기록 수정 (${editing.entry_date})`
+          : editingFavorite
+          ? `자주 복용하는 약 수정 (${editingFavorite.name})`
+          : "오늘의 두통 기록"}
       </h2>
 
       {/* 날짜 */}
@@ -154,26 +199,14 @@ export default function EntryForm({
         <span className="text-sm font-medium">
           약 종류 <span className="text-[#6cbfae]">*</span>
         </span>
-        <div className="mt-1 flex gap-2">
-          <input
-            type="text"
-            required
-            list="medication-options"
-            value={form.medication ?? ""}
-            onChange={(e) => update("medication", e.target.value || null)}
-            className="w-full rounded-lg border p-2"
-          />
-          {/* 별 버튼 : 지금 입력한 약을 즐겨찾기(자주 복용하는 약)에 추가/해제 */}
-          <button
-            type="button"
-            onClick={toggleFavorite}
-            disabled={!currentMedication}
-            title={favoriteMatch ? "즐겨찾기에서 빼기" : "즐겨찾기에 추가"}
-            className="shrink-0 rounded-lg border px-3 text-lg disabled:opacity-30"
-          >
-            {favoriteMatch ? "★" : "☆"}
-          </button>
-        </div>
+        <input
+          type="text"
+          required
+          list="medication-options"
+          value={form.medication ?? ""}
+          onChange={(e) => update("medication", e.target.value || null)}
+          className="mt-1 w-full rounded-lg border p-2"
+        />
         {/* datalist : 입력칸을 클릭하면 이전에 쓴 약들이 선택지로 떠요.
             새 약 이름도 그냥 타이핑하면 되고, 저장되면 다음부터 목록에 나와요! */}
         <datalist id="medication-options">
@@ -275,19 +308,42 @@ export default function EntryForm({
         <span className="text-sm">생리기간</span>
       </label>
 
-      {/* 저장/취소 버튼 */}
+      {/* 저장/취소 버튼 — 모드에 따라 다르게 보여요
+          · 기록 수정 중: 수정 저장하기 + 취소
+          · 즐겨찾기 수정 중: 자주 복용하는 약 수정하기 + 취소
+          · 평소: 기록 저장하기 + 자주 복용하는 약 저장하기 */}
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={saving}
-          className="flex-1 rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
-        >
-          {saving ? "저장 중..." : editing ? "수정 저장하기" : "기록 저장하기"}
-        </button>
+        {!editingFavorite && (
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex-1 rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
+          >
+            {saving ? "저장 중..." : editing ? "수정 저장하기" : "기록 저장하기"}
+          </button>
+        )}
+        {!editing && (
+          <button
+            type="button"
+            onClick={handleSaveFavorite}
+            className="flex-1 rounded-xl border border-[#a7e3d5] bg-white py-2.5 text-sm font-semibold text-[#1f4d44] transition hover:bg-[#eef8f5]"
+          >
+            {editingFavorite ? "자주 복용하는 약 수정하기" : "자주 복용하는 약 저장하기"}
+          </button>
+        )}
         {editing && (
           <button
             type="button"
             onClick={onCancelEdit}
+            className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
+          >
+            취소
+          </button>
+        )}
+        {editingFavorite && (
+          <button
+            type="button"
+            onClick={onCancelFavoriteEdit}
             className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
           >
             취소

@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Boolean, Date, Integer, String, Text
+from sqlalchemy import Boolean, Date, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -24,3 +24,14 @@ class HeadacheEntry(Base):
     bp_pulse: Mapped[int] = mapped_column(Integer, nullable=True)  # 혈압-맥박수
     # Google 로그인 붙이면 사용자 구분에 사용
     user_email: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
+
+
+class FavoriteMedication(Base):
+    """자주 복용하는 약 (사용자당 최대 3개, 백엔드에서 강제)."""
+
+    __tablename__ = "favorite_medications"
+    __table_args__ = (UniqueConstraint("user_email", "name", name="uq_favorite_user_name"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)

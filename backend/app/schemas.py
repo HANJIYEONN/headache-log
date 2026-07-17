@@ -29,3 +29,14 @@ class EntryOut(EntryBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+
+
+class FavoriteMedicationCreate(BaseModel):
+    name: str
+
+
+class FavoriteMedicationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str

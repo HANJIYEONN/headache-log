@@ -87,3 +87,52 @@ export async function deleteEntry(id: number): Promise<void> {
   checkAuth(res);
   if (!res.ok) throw new Error("삭제에 실패했어요");
 }
+
+// ── 자주 복용하는 약 (즐겨찾기, 최대 3개) ──
+export type FavoriteMedication = { id: number; name: string };
+
+export async function fetchFavorites(): Promise<FavoriteMedication[]> {
+  const res = await fetch(`${API_URL}/favorites`, { headers: authHeaders() });
+  checkAuth(res);
+  if (!res.ok) throw new Error("즐겨찾기를 불러오지 못했어요");
+  return res.json();
+}
+
+export async function addFavorite(name: string): Promise<FavoriteMedication> {
+  const res = await fetch(`${API_URL}/favorites`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify({ name }),
+  });
+  checkAuth(res);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.detail || "즐겨찾기 추가에 실패했어요");
+  }
+  return res.json();
+}
+
+export async function deleteFavorite(id: number): Promise<void> {
+  const res = await fetch(`${API_URL}/favorites/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  checkAuth(res);
+  if (!res.ok) throw new Error("즐겨찾기 삭제에 실패했어요");
+}
+
+// ── 즐겨찾기 약 버튼 한 번으로 오늘 기록 바로 저장 ──
+export async function quickAddEntry(medication: string): Promise<Entry> {
+  return createEntry({
+    entry_date: new Date().toISOString().slice(0, 10),
+    menstruating: false,
+    took_painkiller: true,
+    medication,
+    effective: false,
+    dose_count: 1,
+    trigger: null,
+    bp_systolic: null,
+    bp_diastolic: null,
+    bp_pulse: null,
+  });
+}

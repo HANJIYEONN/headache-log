@@ -11,7 +11,14 @@ import EntryForm from "@/components/EntryForm";
 import EntryTable from "@/components/EntryTable";
 import EntryCalendar from "@/components/EntryCalendar";
 import EntryCharts from "@/components/EntryCharts";
-import { fetchEntries, deleteEntry, type Entry } from "@/lib/api";
+import {
+  fetchEntries,
+  deleteEntry,
+  fetchFavorites,
+  quickAddEntry,
+  type Entry,
+  type FavoriteMedication,
+} from "@/lib/api";
 
 // 탭 이름은 이 세 가지 중 하나만 가능하다고 타입으로 못박아요
 type Tab = "list" | "calendar" | "chart";
@@ -31,6 +38,9 @@ export default function Home() {
   const [editing, setEditing] = useState<Entry | null>(null);
   // 로그인한 사용자 이름 (로그인 확인이 끝나야 화면을 보여줘요)
   const [userName, setUserName] = useState<string | null>(null);
+  // 즐겨찾기(자주 복용하는 약, 최대 3개)
+  const [favorites, setFavorites] = useState<FavoriteMedication[]>([]);
+  const [quickAddMessage, setQuickAddMessage] = useState("");
 
   // 페이지 열리자마자 로그인했는지 검사 — 안 했으면 로그인 페이지로!
   useEffect(() => {
@@ -59,10 +69,32 @@ export default function Home() {
     }
   }, []);
 
+  // 즐겨찾기 목록을 불러오는 함수
+  const loadFavorites = useCallback(async () => {
+    try {
+      setFavorites(await fetchFavorites());
+    } catch {
+      // 백엔드가 꺼져 있으면 일단 빈 목록으로 둬요
+    }
+  }, []);
+
   // useEffect : "페이지가 처음 열렸을 때 한 번 실행해줘"
   useEffect(() => {
     load();
-  }, [load]);
+    loadFavorites();
+  }, [load, loadFavorites]);
+
+  // 즐겨찾기 버튼 클릭: 오늘 기록을 바로 완성해서 저장
+  async function handleQuickAdd(name: string) {
+    setQuickAddMessage("");
+    try {
+      await quickAddEntry(name);
+      setQuickAddMessage(`${name} 기록을 오늘 목록에 추가했어요!`);
+      load();
+    } catch {
+      setQuickAddMessage("추가에 실패했어요. 다시 시도해주세요.");
+    }
+  }
 
   // 삭제 버튼 처리
   async function handleDelete(id: number) {
@@ -107,8 +139,33 @@ export default function Home() {
         </div>
       </div>
 
+      {/* 즐겨찾기(자주 복용하는 약) 버튼 — 누르면 오늘 기록으로 바로 저장 */}
+      {favorites.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {favorites.map((fav) => (
+              <button
+                key={fav.id}
+                onClick={() => handleQuickAdd(fav.name)}
+                className="rounded-full border border-[#d4efe8] bg-white px-4 py-2 text-sm font-medium text-[#1f4d44] hover:bg-[#eef8f5]"
+              >
+                ★ {fav.name} 복용
+              </button>
+            ))}
+          </div>
+          {quickAddMessage && <p className="text-sm text-gray-500">{quickAddMessage}</p>}
+        </div>
+      )}
+
       {/* 입력 폼 — 저장이 끝나면 목록 새로고침, editing이 있으면 수정 모드 */}
-      <EntryForm onSaved={handleSaved} editing={editing} onCancelEdit={() => setEditing(null)} medications={medications} />
+      <EntryForm
+        onSaved={handleSaved}
+        editing={editing}
+        onCancelEdit={() => setEditing(null)}
+        medications={medications}
+        favorites={favorites}
+        onFavoritesChanged={loadFavorites}
+      />
 
       {/* 3탭: 목록 / 달력 / 차트 */}
       <section className="space-y-4">

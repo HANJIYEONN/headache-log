@@ -8,7 +8,17 @@
 // ─────────────────────────────────────────────
 
 import { useEffect, useState } from "react";
-import { createEntry, updateEntry, type Entry, type NewEntry } from "@/lib/api";
+import {
+  createEntry,
+  updateEntry,
+  addFavorite,
+  deleteFavorite,
+  type Entry,
+  type FavoriteMedication,
+  type NewEntry,
+} from "@/lib/api";
+
+const MAX_FAVORITES = 3;
 
 // props = 부모 컴포넌트가 넘겨주는 값
 // editing이 있으면 "새 기록"이 아니라 "그 기록을 고치는 중"이에요
@@ -17,6 +27,8 @@ type Props = {
   editing: Entry | null;      // 수정 중인 기록 (없으면 null)
   onCancelEdit: () => void;   // 수정 취소할 때 부모에게 알리기
   medications: string[];      // 지금까지 입력한 약 이름들 (자동완성 목록용)
+  favorites: FavoriteMedication[];  // 즐겨찾기(자주 복용하는 약) 목록
+  onFavoritesChanged: () => void;   // 즐겨찾기 추가/삭제 후 부모에게 새로고침 요청
 };
 
 // 폼의 초기값 (오늘 날짜로 시작)
@@ -35,7 +47,14 @@ function emptyForm(): NewEntry {
   };
 }
 
-export default function EntryForm({ onSaved, editing, onCancelEdit, medications }: Props) {
+export default function EntryForm({
+  onSaved,
+  editing,
+  onCancelEdit,
+  medications,
+  favorites,
+  onFavoritesChanged,
+}: Props) {
   // ── state : 컴포넌트가 "기억하는 값" ──
   // form 값이 바뀔 때마다 React가 화면을 자동으로 다시 그려줘요 ✨
   const [form, setForm] = useState<NewEntry>(emptyForm());
@@ -60,6 +79,29 @@ export default function EntryForm({ onSaved, editing, onCancelEdit, medications 
   // 예: update("dose_count", 2) → 복용횟수만 2로 변경
   function update<K extends keyof NewEntry>(key: K, value: NewEntry[K]) {
     setForm({ ...form, [key]: value }); // ...form = 기존 값 복사 후 한 칸만 덮어쓰기
+  }
+
+  // 지금 입력한 약이 이미 즐겨찾기에 있는지 찾기 (있으면 그 항목, 없으면 undefined)
+  const currentMedication = form.medication?.trim();
+  const favoriteMatch = favorites.find((f) => f.name === currentMedication);
+
+  // 별 버튼을 눌렀을 때: 즐겨찾기에 있으면 빼고, 없으면 추가
+  async function toggleFavorite() {
+    if (!currentMedication) return;
+    try {
+      if (favoriteMatch) {
+        await deleteFavorite(favoriteMatch.id);
+      } else {
+        if (favorites.length >= MAX_FAVORITES) {
+          setMessage(`즐겨찾기는 최대 ${MAX_FAVORITES}개까지예요`);
+          return;
+        }
+        await addFavorite(currentMedication);
+      }
+      onFavoritesChanged(); // 부모에게 "즐겨찾기 목록 새로고침해줘" 알리기
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "즐겨찾기 처리에 실패했어요");
+    }
   }
 
   // 저장 버튼을 눌렀을 때 실행되는 함수
@@ -112,14 +154,26 @@ export default function EntryForm({ onSaved, editing, onCancelEdit, medications 
         <span className="text-sm font-medium">
           약 종류 <span className="text-[#6cbfae]">*</span>
         </span>
-        <input
-          type="text"
-          required
-          list="medication-options"
-          value={form.medication ?? ""}
-          onChange={(e) => update("medication", e.target.value || null)}
-          className="mt-1 w-full rounded-lg border p-2"
-        />
+        <div className="mt-1 flex gap-2">
+          <input
+            type="text"
+            required
+            list="medication-options"
+            value={form.medication ?? ""}
+            onChange={(e) => update("medication", e.target.value || null)}
+            className="w-full rounded-lg border p-2"
+          />
+          {/* 별 버튼 : 지금 입력한 약을 즐겨찾기(자주 복용하는 약)에 추가/해제 */}
+          <button
+            type="button"
+            onClick={toggleFavorite}
+            disabled={!currentMedication}
+            title={favoriteMatch ? "즐겨찾기에서 빼기" : "즐겨찾기에 추가"}
+            className="shrink-0 rounded-lg border px-3 text-lg disabled:opacity-30"
+          >
+            {favoriteMatch ? "★" : "☆"}
+          </button>
+        </div>
         {/* datalist : 입력칸을 클릭하면 이전에 쓴 약들이 선택지로 떠요.
             새 약 이름도 그냥 타이핑하면 되고, 저장되면 다음부터 목록에 나와요! */}
         <datalist id="medication-options">

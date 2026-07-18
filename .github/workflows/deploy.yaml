@@ -1,0 +1,79 @@
+name: AI Server Deploy to OCI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+    
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE_CONTENT: ${{ secrets.ENV_FILE_CONTENT }}
+        with:
+          host: ${{ secrets.OCI_HOST }}
+          username: ${{ secrets.OCI_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          envs: ENV_FILE_CONTENT
+          script: |
+            set -e
+
+            APP_DIR="$HOME/headacat"
+            BACKEND_DIR="$APP_DIR/backend"
+
+            IMG_NAME="headacat-backend"
+            CONTAINER_NAME="headacat-backend"
+            REPOSITORY_URL="https://github.com/krumichan/CatPjt-TranslaCat-ai.git"
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              git clone "$REPOSITORY_URL" "$APP_DIR"
+            else
+              cd "$BACKEND_DIR"
+              git fetch origin main
+              git pull origin main
+            fi
+
+            if [ ! -d "$BACKEND_DIR" ]; then
+              echo "Error: backend directory not found."
+              exit 1
+            fi
+
+            if [ ! -f "$BACKEND_DIR/Dockerfile" ]; then
+              echo "Error: backend/Dockerfile not found."
+              exit 1
+            fi
+
+            cd "$BACKEND_DIR"
+
+            printf '%s' "$ENV_FILE_CONTENT" > .env
+            chmod 600 .env
+
+            docker build -t "$IMG_NAME" .
+            docker stop "$CONTAINER_NAME" || true
+            docker rm "$CONTAINER_NAME" || true
+
+            docker run -d --name "$CONTAINER_NAME" --env-file .env -p 8000:8000 "$IMG_NAME"
+
+            echo "Waiting for server to start (Max 5 minutes)..."
+            SUCCESS=false
+            for i in {1..60}; do
+              if curl -fsS http://localhost:8000/openapi.json > /dev/null; then
+                echo "Success!"
+                SUCCESS=true
+                break
+              fi
+
+              echo "Attempt $i: Server not ready yet... waiting 5 seconds."
+              sleep 5
+            done
+
+            if [ "$SUCCESS" = false ]; then
+              echo "Error..."
+              docker logs "$CONTAINER_NAME"
+              exit 1
+            fi

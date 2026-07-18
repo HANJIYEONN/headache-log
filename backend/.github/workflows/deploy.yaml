@@ -18,23 +18,31 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           command_timeout: 30m
           script: |
-            cd ~
-            mkdir -p headacat
-            cd ~/headacat
+            APP_DIR="$HOME/headacat"
+            IMG_NAME="headacat"
+            CONTAINER_NAME="fastapi-app"
+            REPOSITORY_URL="https://github.com/krumichan/CatPjt-TranslaCat-ai.git"
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              git clone "$REPOSITORY_URL" "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
             git pull origin main
 
             echo "${{ secrets.ENV_FILE_CONTENT }}" > .env
+            chmod 600 .env
 
-            docker build -t headacat-ai .
-            docker stop fastapi-app || true
-            docker rm fastapi-app || true
+            docker build -t "$IMG_NAME" .
+            docker stop "$CONTAINER_NAME" || true
+            docker rm "$CONTAINER_NAME" || true
 
-            docker run -d --name fastapi-app -p 8000:8000 headacat-ai
+            docker run -d --name "$CONTAINER_NAME" --env-file .env -p 8000:8000 "$IMG_NAME"
 
             echo "Waiting for server to start (Max 5 minutes)..."
             SUCCESS=false
             for i in {1..60}; do
-              if curl -s --head http://localhost:8000 | grep -E "200|405" > /dev/null; then
+              if curl -fsS http://localhost:8000/openapi.json > /dev/null; then
                 echo "Success!"
                 SUCCESS=true
                 break
@@ -46,6 +54,6 @@ jobs:
 
             if [ "$SUCCESS" = false ]; then
               echo "Error..."
-              docker logs fastapi-app
+              docker logs "$CONTAINER_NAME"
               exit 1
             fi

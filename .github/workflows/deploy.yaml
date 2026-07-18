@@ -28,7 +28,7 @@ jobs:
 
             IMG_NAME="headacat-backend"
             CONTAINER_NAME="headacat-backend"
-            REPOSITORY_URL="https://github.com/krumichan/CatPjt-TranslaCat-ai.git"
+            REPOSITORY_URL="https://github.com/HANJIYEONN/headache-log.git"
 
             if [ ! -d "$APP_DIR/.git" ]; then
               git clone "$REPOSITORY_URL" "$APP_DIR"

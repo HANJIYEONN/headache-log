@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import EntryForm from "@/components/EntryForm";
+import LogoutIcon from "@/components/LogoutIcon";
 import EntryTable from "@/components/EntryTable";
 import EntryCalendar from "@/components/EntryCalendar";
 import EntryCharts from "@/components/EntryCharts";
@@ -148,17 +149,20 @@ export default function Home() {
   return (
     // w-full : flex 부모 안에서 내용 크기에 따라 줄어들지 않고 항상 최대 폭 유지
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-gray-600">{userName}님</span>
-          <button
-            onClick={handleLogout}
-            className="rounded-lg border border-[#d4efe8] bg-white px-3 py-1 text-gray-500 hover:bg-[#eef8f5]"
-          >
-            로그아웃
-          </button>
+      <div className="flex items-start justify-between">
+        {/* 제목 + 이름을 세로로 쌓아서 좁은 화면에서도 안 겹치게 */}
+        <div>
+          <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
+          <p className="mt-1 text-sm text-gray-600">{userName}님</p>
         </div>
+        <button
+          onClick={handleLogout}
+          title="로그아웃"
+          aria-label="로그아웃"
+          className="rounded-lg border border-[#d4efe8] bg-white p-2 text-gray-500 hover:bg-[#eef8f5] hover:text-[#178f76]"
+        >
+          <LogoutIcon />
+        </button>
       </div>
 
       {/* 자주 복용하는 약 — 이름 누르면 오늘 기록으로 바로 저장, 수정/삭제 버튼 포함 */}

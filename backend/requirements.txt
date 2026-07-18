@@ -2,6 +2,8 @@ fastapi
 uvicorn[standard]
 sqlalchemy
 psycopg2-binary
+pymysql
+cryptography
 pydantic-settings
 python-dotenv
 google-auth

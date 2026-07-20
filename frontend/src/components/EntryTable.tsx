@@ -7,6 +7,11 @@
 
 import type { Entry } from "@/lib/api";
 
+// "2026-07-18" → "07.18" (mm.dd 형식으로 짧게)
+function shortDate(dateStr: string): string {
+  return dateStr.slice(5).replace("-", ".");
+}
+
 type Props = {
   entries: Entry[];
   onDelete: (id: number) => void;
@@ -30,8 +35,8 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
             <th className="p-3 font-semibold">복용횟수</th>
             <th className="p-3 font-semibold">효과</th>
             <th className="p-3 font-semibold">촉발요인</th>
-            <th className="p-3 font-semibold">생리기간</th>
-            <th className="p-3 font-semibold">혈압(맥박)</th>
+            <th className="p-3 font-semibold">생리</th>
+            <th className="p-3 font-semibold">혈압</th>
             <th className="p-3"></th>
           </tr>
         </thead>
@@ -39,10 +44,10 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
         <tbody>
           {entries.map((entry) => (
             <tr key={entry.id} className="border-b border-[#eef8f5] last:border-0">
-              <td className="p-3 font-medium">{entry.entry_date}</td>
+              <td className="p-3 font-medium">{shortDate(entry.entry_date)}</td>
               <td className="p-3">{entry.medication ?? "-"}</td>
               <td className="p-3">{entry.dose_count ?? "-"}회</td>
-              <td className="p-3">{entry.effective ? "있음" : "없음"}</td>
+              <td className="p-3">{entry.effective ? "O" : "X"}</td>
               <td className="p-3">{entry.trigger ?? "-"}</td>
               <td className="p-3">{entry.menstruating ? "O" : "-"}</td>
               <td className="p-3">

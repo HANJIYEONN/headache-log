@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import BrainIcon from '@/components/BrainIcon';
+import CatIcon from '@/components/CatIcon';
 import GoogleGIcon from '@/components/GoogleGIcon';
 
 const BUTTON_WIDTH = 280; // 커스텀 버튼과 실제 구글 버튼의 폭을 똑같이 맞춰요
@@ -52,13 +52,13 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center p-6">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#d4efe8] bg-white p-8 text-center shadow-sm">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#f0d9c2] bg-white p-8 text-center shadow-sm">
         <div className="space-y-2">
-          {/* 뇌 아이콘을 동그란 민트 배지 안에 가운데 정렬 */}
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#eef8f5] text-[#178f76]">
-            <BrainIcon className="h-8 w-8" />
+          {/* 고양이 아이콘을 동그란 진저 배지 안에 가운데 정렬 */}
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fbefe2] text-[#c05f22]">
+            <CatIcon className="h-8 w-8" />
           </div>
-          <h1 className="text-xl font-bold text-[#48a08e]">world-holicat</h1>
+          <h1 className="text-xl font-bold text-[#d17a3f]">world-holicat</h1>
           <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
         </div>
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
           <button
             type="button"
             tabIndex={-1}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4efe8] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#eef8f5]"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#f0d9c2] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#fbefe2]"
           >
             <GoogleGIcon />
             Google 계정으로 로그인

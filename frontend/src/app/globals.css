@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  /* 연한 민트색 배경 — 앱 전체 분위기를 정하는 색 */
-  --background: #f2faf8;
-  --foreground: #1f3d37;
+  /* 따뜻한 크림색 배경 — world-holicat 고양이 테마 */
+  --background: #fdf6ef;
+  --foreground: #4a3524;
 }
 
 @theme inline {
@@ -13,7 +13,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* 다크모드여도 앱은 항상 연한 민트 톤을 유지해요 */
+/* 다크모드여도 앱은 항상 크림 톤을 유지해요 */
 
 html {
   /* 탭마다 내용 길이가 달라도 화면 폭이 흔들리지 않게,

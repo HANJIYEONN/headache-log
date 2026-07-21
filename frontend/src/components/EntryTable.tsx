@@ -25,11 +25,11 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
 
   return (
     // 표가 화면보다 넓으면 표 안에서만 가로 스크롤되게 감싸요
-    <div className="overflow-x-auto rounded-xl border border-[#d4efe8] bg-white">
+    <div className="overflow-x-auto rounded-xl border border-[#f0d9c2] bg-white">
       <table className="w-full text-sm">
         {/* thead = 표의 머리(제목 줄) */}
         <thead>
-          <tr className="border-b border-[#d4efe8] bg-[#eef8f5] text-left text-[#1f4d44]">
+          <tr className="border-b border-[#f0d9c2] bg-[#fbefe2] text-left text-[#5c3a20]">
             <th className="p-3 font-semibold">날짜</th>
             <th className="p-3 font-semibold">약 종류</th>
             <th className="p-3 font-semibold">복용횟수</th>
@@ -43,7 +43,7 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
         {/* tbody = 표의 몸통(데이터 줄들) */}
         <tbody>
           {entries.map((entry) => (
-            <tr key={entry.id} className="border-b border-[#eef8f5] last:border-0">
+            <tr key={entry.id} className="border-b border-[#fbefe2] last:border-0">
               <td className="p-3 font-medium">{shortDate(entry.entry_date)}</td>
               <td className="p-3">{entry.medication ?? "-"}</td>
               <td className="p-3">{entry.dose_count ?? "-"}회</td>
@@ -58,7 +58,7 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
               <td className="p-3 text-right">
                 <button
                   onClick={() => onEdit(entry)}
-                  className="mr-2 text-xs text-gray-400 hover:text-[#178f76]"
+                  className="mr-2 text-xs text-gray-400 hover:text-[#c05f22]"
                 >
                   수정
                 </button>

@@ -153,7 +153,7 @@ export default function Home() {
       <div className="flex items-start justify-between">
         {/* 제목 + 이름을 세로로 쌓아서 좁은 화면에서도 안 겹치게 */}
         <div>
-          <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
+          <h1 className="text-2xl font-bold text-[#d17a3f]">두통 기록 차트</h1>
           <p className="mt-1 text-sm text-gray-600">{userName}님</p>
         </div>
         <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ export default function Home() {
           <Link
             href="/"
             title="프로젝트 선택으로"
-            className="rounded-lg border border-[#d4efe8] bg-white px-3 py-2 text-sm text-gray-500 hover:bg-[#eef8f5] hover:text-[#178f76]"
+            className="rounded-lg border border-[#f0d9c2] bg-white px-3 py-2 text-sm text-gray-500 hover:bg-[#fbefe2] hover:text-[#c05f22]"
           >
             홈
           </Link>
@@ -169,7 +169,7 @@ export default function Home() {
             onClick={handleLogout}
             title="로그아웃"
             aria-label="로그아웃"
-            className="rounded-lg border border-[#d4efe8] bg-white p-2 text-gray-500 hover:bg-[#eef8f5] hover:text-[#178f76]"
+            className="rounded-lg border border-[#f0d9c2] bg-white p-2 text-gray-500 hover:bg-[#fbefe2] hover:text-[#c05f22]"
           >
             <LogoutIcon />
           </button>
@@ -183,24 +183,24 @@ export default function Home() {
             {favorites.map((fav) => (
               <div
                 key={fav.id}
-                className="flex items-center overflow-hidden rounded-full border border-[#d4efe8] bg-white text-sm"
+                className="flex items-center overflow-hidden rounded-full border border-[#f0d9c2] bg-white text-sm"
               >
                 <button
                   onClick={() => handleQuickAdd(fav)}
                   title="누르면 오늘 복용 기록으로 저장돼요"
-                  className="px-4 py-2 font-medium text-[#1f4d44] hover:bg-[#eef8f5]"
+                  className="px-4 py-2 font-medium text-[#5c3a20] hover:bg-[#fbefe2]"
                 >
                   {fav.name} 복용
                 </button>
                 <button
                   onClick={() => handleEditFavorite(fav)}
-                  className="border-l border-[#eef8f5] px-3 py-2 text-xs text-gray-400 hover:bg-[#eef8f5] hover:text-[#178f76]"
+                  className="border-l border-[#fbefe2] px-3 py-2 text-xs text-gray-400 hover:bg-[#fbefe2] hover:text-[#c05f22]"
                 >
                   수정
                 </button>
                 <button
                   onClick={() => handleDeleteFavorite(fav.id)}
-                  className="border-l border-[#eef8f5] px-3 py-2 text-xs text-gray-400 hover:bg-[#eef8f5] hover:text-red-500"
+                  className="border-l border-[#fbefe2] px-3 py-2 text-xs text-gray-400 hover:bg-[#fbefe2] hover:text-red-500"
                 >
                   삭제
                 </button>
@@ -233,8 +233,8 @@ export default function Home() {
               onClick={() => setTab(key)}
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                 tab === key
-                  ? "bg-[#a7e3d5] text-[#1f4d44]"
-                  : "bg-white text-gray-500 hover:bg-[#eef8f5]"
+                  ? "bg-[#f6c99a] text-[#5c3a20]"
+                  : "bg-white text-gray-500 hover:bg-[#fbefe2]"
               }`}
             >
               {label}

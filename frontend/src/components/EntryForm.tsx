@@ -173,8 +173,8 @@ export default function EntryForm({
 
   // ── 화면(JSX) : HTML처럼 생겼지만 { } 안에 자바스크립트를 쓸 수 있어요 ──
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#d4efe8] bg-white p-6 text-gray-900 shadow-sm">
-      <h2 className="text-lg font-bold text-[#48a08e]">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#f0d9c2] bg-white p-6 text-gray-900 shadow-sm">
+      <h2 className="text-lg font-bold text-[#d17a3f]">
         {editing
           ? `기록 수정 (${editing.entry_date})`
           : editingFavorite
@@ -197,7 +197,7 @@ export default function EntryForm({
       {/* 약 종류 */}
       <label className="block">
         <span className="text-sm font-medium">
-          약 종류 <span className="text-[#6cbfae]">*</span>
+          약 종류 <span className="text-[#dd9b63]">*</span>
         </span>
         <input
           type="text"
@@ -220,7 +220,7 @@ export default function EntryForm({
       <div className="flex gap-4">
         <label className="block flex-1">
           <span className="text-sm">
-            복용횟수 <span className="text-[#6cbfae]">*</span>
+            복용횟수 <span className="text-[#dd9b63]">*</span>
           </span>
           <input
             type="number"
@@ -264,7 +264,7 @@ export default function EntryForm({
       </label>
 
       {recordBp && (
-      <div className="grid grid-cols-3 gap-3 rounded-lg bg-[#eef8f5] p-3">
+      <div className="grid grid-cols-3 gap-3 rounded-lg bg-[#fbefe2] p-3">
         <label className="block">
           <span className="text-sm">수축기</span>
           <input
@@ -317,7 +317,7 @@ export default function EntryForm({
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
+            className="flex-1 rounded-xl bg-[#f6c99a] py-2.5 font-semibold text-[#5c3a20] transition hover:bg-[#f0b57e] disabled:opacity-50"
           >
             {saving ? "저장 중..." : editing ? "수정 저장하기" : "기록 저장하기"}
           </button>
@@ -326,7 +326,7 @@ export default function EntryForm({
           <button
             type="button"
             onClick={handleSaveFavorite}
-            className="flex-1 rounded-xl border border-[#a7e3d5] bg-white py-2.5 text-sm font-semibold text-[#1f4d44] transition hover:bg-[#eef8f5]"
+            className="flex-1 rounded-xl border border-[#f6c99a] bg-white py-2.5 text-sm font-semibold text-[#5c3a20] transition hover:bg-[#fbefe2]"
           >
             {editingFavorite ? "자주 복용하는 약 수정하기" : "자주 복용하는 약 저장하기"}
           </button>
@@ -335,7 +335,7 @@ export default function EntryForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
+            className="rounded-xl border border-[#f0d9c2] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#fbefe2]"
           >
             취소
           </button>
@@ -344,7 +344,7 @@ export default function EntryForm({
           <button
             type="button"
             onClick={onCancelFavoriteEdit}
-            className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
+            className="rounded-xl border border-[#f0d9c2] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#fbefe2]"
           >
             취소
           </button>

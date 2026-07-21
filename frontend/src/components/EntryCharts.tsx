@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────
 // EntryCharts : 기록을 통계로 보여주는 컴포넌트
 // 차트 라이브러리 없이 div의 너비/높이로 막대를 그려봐요!
-// 막대 색 #178f76 은 배경과의 대비 검사를 통과한 민트예요
+// 막대 색 #c05f22 은 흰 배경에서 대비 4.28:1 로 검사를 통과한 진저색이에요
 // ─────────────────────────────────────────────
 
 import type { Entry } from "@/lib/api";
@@ -12,7 +12,7 @@ type Props = {
   entries: Entry[];
 };
 
-const BAR = "#178f76"; // 차트 막대 전용 민트 (연한 배경에서도 잘 보이는 진하기)
+const BAR = "#c05f22"; // 차트 막대 전용 진저색 (연한 배경에서도 잘 보이는 진하기)
 
 export default function EntryCharts({ entries }: Props) {
   if (entries.length === 0) {
@@ -46,8 +46,8 @@ export default function EntryCharts({ entries }: Props) {
   return (
     <div className="space-y-6">
       {/* 월별 두통 횟수 — 세로 막대 + 세로축 눈금 */}
-      <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-        <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">월별 두통 횟수</h3>
+      <div className="rounded-xl border border-[#f0d9c2] bg-white p-4">
+        <h3 className="mb-3 text-sm font-bold text-[#5c3a20]">월별 두통 횟수</h3>
         <div className="flex gap-2">
           {/* 세로축(y축) 숫자 — bottom %로 눈금 위치에 딱 맞춰요 */}
           <div className="relative h-32 w-5">
@@ -96,13 +96,13 @@ export default function EntryCharts({ entries }: Props) {
 
       {/* 촉발요인 분포 — 가로 막대 */}
       {triggers.length > 0 && (
-        <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-          <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">촉발요인 TOP {triggers.length}</h3>
+        <div className="rounded-xl border border-[#f0d9c2] bg-white p-4">
+          <h3 className="mb-3 text-sm font-bold text-[#5c3a20]">촉발요인 TOP {triggers.length}</h3>
           <div className="space-y-2">
             {triggers.map(([name, count]) => (
               <div key={name} className="flex items-center gap-2 text-xs" title={`${name}: ${count}회`}>
                 <span className="w-24 shrink-0 truncate text-gray-600">{name}</span>
-                <div className="h-4 flex-1 rounded bg-[#eef8f5]">
+                <div className="h-4 flex-1 rounded bg-[#fbefe2]">
                   <div
                     className="h-4 rounded"
                     style={{ width: `${(count / maxTrigger) * 100}%`, backgroundColor: BAR }}

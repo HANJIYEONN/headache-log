@@ -53,14 +53,14 @@ export default function Home() {
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#48a08e]">프로젝트 선택</h1>
+          <h1 className="text-2xl font-bold text-[#d17a3f]">프로젝트 선택</h1>
           <p className="mt-1 text-sm text-gray-600">{userName}님, 어떤 걸 열까요?</p>
         </div>
         <button
           onClick={handleLogout}
           title="로그아웃"
           aria-label="로그아웃"
-          className="rounded-lg border border-[#d4efe8] bg-white p-2 text-gray-500 hover:bg-[#eef8f5] hover:text-[#178f76]"
+          className="rounded-lg border border-[#f0d9c2] bg-white p-2 text-gray-500 hover:bg-[#fbefe2] hover:text-[#c05f22]"
         >
           <LogoutIcon />
         </button>
@@ -70,12 +70,12 @@ export default function Home() {
       <div className="grid gap-4 sm:grid-cols-2">
         {PROJECTS.map((project) => {
           const inner = (
-            <div className="flex h-full flex-col gap-3 rounded-2xl border border-[#d4efe8] bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#eef8f5] text-[#178f76]">
+            <div className="flex h-full flex-col gap-3 rounded-2xl border border-[#f0d9c2] bg-white p-6 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#fbefe2] text-[#c05f22]">
                 <BrainIcon className="h-7 w-7" />
               </div>
               <div>
-                <h2 className="font-bold text-[#1f4d44]">{project.title}</h2>
+                <h2 className="font-bold text-[#5c3a20]">{project.title}</h2>
                 <p className="mt-1 text-sm text-gray-500">{project.description}</p>
               </div>
               {!project.ready && (

@@ -24,31 +24,26 @@ jobs:
             set -e
 
             APP_DIR="$HOME/headacat"
-            BACKEND_DIR="$APP_DIR/backend"
 
             IMG_NAME="headacat-backend"
             CONTAINER_NAME="headacat-backend"
-            REPOSITORY_URL="https://github.com/HANJIYEONN/headache-log.git"
+            REPOSITORY_URL="https://github.com/HANJIYEONN/headache-log-backend.git"
+
+            mkdir -p headacat
 
             if [ ! -d "$APP_DIR/.git" ]; then
-              git clone "$REPOSITORY_URL" "$APP_DIR"
-            else
-              cd "$BACKEND_DIR"
-              git fetch origin main
-              git pull origin main
+              git clone "$REPOSITORY_URL" "$APP_DIR"            
             fi
 
-            if [ ! -d "$BACKEND_DIR" ]; then
-              echo "Error: backend directory not found."
-              exit 1
-            fi
-
-            if [ ! -f "$BACKEND_DIR/Dockerfile" ]; then
+            if [ ! -f "$APP_DIR/Dockerfile" ]; then
               echo "Error: backend/Dockerfile not found."
               exit 1
             fi
 
-            cd "$BACKEND_DIR"
+            cd "$APP_DIR"
+
+            git fetch origin main
+            git pull origin main
 
             printf '%s' "$ENV_FILE_CONTENT" > .env
             chmod 600 .env

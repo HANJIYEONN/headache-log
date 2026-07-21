@@ -58,7 +58,7 @@ export default function LoginPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#eef8f5] text-[#178f76]">
             <BrainIcon className="h-8 w-8" />
           </div>
-          <h1 className="text-xl font-bold text-[#48a08e]">두통 기록 차트</h1>
+          <h1 className="text-xl font-bold text-[#48a08e]">world-holicat</h1>
           <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
         </div>
 

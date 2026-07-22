@@ -3,12 +3,16 @@
 import { useEffect, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import CatIcon from '@/components/CatIcon';
+import CatSittingIcon from '@/components/CatSittingIcon';
 import GoogleGIcon from '@/components/GoogleGIcon';
 
 const BUTTON_WIDTH = 280; // 커스텀 버튼과 실제 구글 버튼의 폭을 똑같이 맞춰요
 
 export default function LoginPage() {
   const [error, setError] = useState('');
+  // 고양이 아이콘: 기본은 식빵 자세 🍞, 클릭하면 앉은 자세로 고정
+  // (마우스 올렸을 때 바뀌는 건 아래 CSS group-hover가 처리해요)
+  const [catSitting, setCatSitting] = useState(false);
 
   // 이미 로그인한 상태면 메인으로 보내요
   useEffect(() => {
@@ -54,10 +58,24 @@ export default function LoginPage() {
     <main className="flex min-h-screen w-full items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#f0d9c2] bg-white p-8 text-center shadow-sm">
         <div className="space-y-2">
-          {/* 고양이 아이콘을 동그란 진저 배지 안에 가운데 정렬 */}
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fbefe2] text-[#c05f22]">
-            <CatIcon className="h-8 w-8" />
-          </div>
+          {/* 고양이 아이콘 배지 — 마우스를 올리거나 누르면 식빵→앉은 고양이로 바뀌어요 */}
+          {/* group : 이 버튼에 마우스를 올리면 안쪽 요소들이 group-hover 로 반응해요 */}
+          <button
+            type="button"
+            onClick={() => setCatSitting((prev) => !prev)}
+            title={catSitting ? '앉은 고양이 (다시 누르면 식빵)' : '식빵 고양이 (눌러보세요)'}
+            aria-label="고양이 아이콘"
+            className="group mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fbefe2] text-[#c05f22] transition hover:bg-[#f7e2cd]"
+          >
+            {/* 식빵 고양이: 평소엔 보이고, 마우스 올리면 숨어요 */}
+            <CatIcon
+              className={`h-8 w-8 ${catSitting ? 'hidden' : 'block group-hover:hidden'}`}
+            />
+            {/* 앉은 고양이: 평소엔 숨어있고, 마우스 올리거나 클릭하면 나와요 */}
+            <CatSittingIcon
+              className={`h-8 w-8 ${catSitting ? 'block' : 'hidden group-hover:block'}`}
+            />
+          </button>
           <h1 className="text-xl font-bold text-[#d17a3f]">world-holicat</h1>
           <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
         </div>

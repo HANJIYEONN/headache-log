@@ -58,14 +58,14 @@ export default function EntryCalendar({ entries }: Props) {
       <div className="flex items-center justify-between">
         <button
           onClick={() => moveMonth(-1)}
-          className="rounded-lg border border-[#f0d9c2] bg-white px-3 py-1 hover:bg-[#fbefe2]"
+          className="rounded-lg border border-[#d4efe8] bg-white px-3 py-1 hover:bg-[#eef8f5]"
         >
           이전 달
         </button>
-        <p className="font-bold text-[#5c3a20]">{ym(year, month)}</p>
+        <p className="font-bold text-[#1f4d44]">{ym(year, month)}</p>
         <button
           onClick={() => moveMonth(1)}
-          className="rounded-lg border border-[#f0d9c2] bg-white px-3 py-1 hover:bg-[#fbefe2]"
+          className="rounded-lg border border-[#d4efe8] bg-white px-3 py-1 hover:bg-[#eef8f5]"
         >
           다음 달
         </button>
@@ -89,9 +89,9 @@ export default function EntryCalendar({ entries }: Props) {
               onClick={() => setSelected(isSelected ? null : dateStr)}
               className={`rounded-lg py-2 transition ${
                 count > 0
-                  ? "bg-[#f6c99a] font-semibold text-[#5c3a20] hover:bg-[#f0b57e]"
-                  : "bg-white hover:bg-[#fbefe2]"
-              } ${isSelected ? "ring-2 ring-[#c05f22]" : ""}`}
+                  ? "bg-[#a7e3d5] font-semibold text-[#1f4d44] hover:bg-[#8fd9c8]"
+                  : "bg-white hover:bg-[#eef8f5]"
+              } ${isSelected ? "ring-2 ring-[#178f76]" : ""}`}
             >
               {day}
               {/* 기록 있는 날은 개수 표시 */}
@@ -103,8 +103,8 @@ export default function EntryCalendar({ entries }: Props) {
 
       {/* 선택한 날의 상세 기록 */}
       {selected && (
-        <div className="rounded-xl border border-[#f0d9c2] bg-white p-4 text-sm">
-          <p className="mb-2 font-bold text-[#5c3a20]">{selected}</p>
+        <div className="rounded-xl border border-[#d4efe8] bg-white p-4 text-sm">
+          <p className="mb-2 font-bold text-[#1f4d44]">{selected}</p>
           {selectedEntries.length === 0 ? (
             <p className="text-gray-500">이 날은 기록이 없어요.</p>
           ) : (

@@ -5,6 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import CatIcon from '@/components/CatIcon';
 import CatSittingIcon from '@/components/CatSittingIcon';
 import GoogleGIcon from '@/components/GoogleGIcon';
+import { playMeow } from '@/lib/meow';
 
 const BUTTON_WIDTH = 280; // 커스텀 버튼과 실제 구글 버튼의 폭을 똑같이 맞춰요
 
@@ -62,7 +63,11 @@ export default function LoginPage() {
           {/* group : 이 버튼에 마우스를 올리면 안쪽 요소들이 group-hover 로 반응해요 */}
           <button
             type="button"
-            onClick={() => setCatSitting((prev) => !prev)}
+            onMouseEnter={playMeow}
+            onClick={() => {
+              playMeow(); // 폰에는 마우스가 없으니 탭할 때도 울어요
+              setCatSitting((prev) => !prev);
+            }}
             title={catSitting ? '앉은 고양이 (다시 누르면 식빵)' : '식빵 고양이 (눌러보세요)'}
             aria-label="고양이 아이콘"
             className="group mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fbefe2] text-[#c05f22] transition hover:bg-[#f7e2cd]"

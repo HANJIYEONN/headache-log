@@ -18,9 +18,20 @@ import LogoutIcon from "@/components/LogoutIcon";
 const PROFILE = {
   name: "Han Jiyeon",
   handle: "@HANJIYEONN",
+  github: "https://github.com/HANJIYEONN", // 핸들을 누르면 여기로 가요
   role: "Full-stack Developer",
-  bio: "만들면서 배우는 중이에요. Next.js로 화면을, FastAPI로 서버를 만들어요.",
+  bio: "오늘도 무언가를 만들고 있습니다.",
   stack: ["Next.js", "TypeScript", "FastAPI", "MySQL"],
+};
+
+// 프로젝트마다 자기 색을 가져요 — 칸을 보면 어떤 프로젝트인지 색으로 바로 알 수 있게요.
+// 아래 민트 색들은 두통 기록 차트 안에서 실제로 쓰는 색 그대로예요.
+const MINT = {
+  box: "bg-white border-[#d4efe8]", // 칸 배경은 하얀색, 테두리만 민트
+  icon: "bg-[#d4efe8] text-[#178f76]", // 왼쪽 아이콘 자리
+  title: "text-[#1f4d44]", // 제목 글자
+  desc: "text-[#48a08e]", // 설명 글자
+  arrow: "text-[#8fd9c8]", // 오른쪽 화살표
 };
 
 // 프로젝트 목록 — href가 있으면 들어갈 수 있고, ready:false면 "준비 중"
@@ -31,9 +42,10 @@ const PROJECTS = [
     description: "투약 기록을 남기고 통계로 확인해요",
     href: "/headache",
     ready: true,
+    theme: MINT,
   },
   // 예시: 다음 프로젝트가 생기면 이런 식으로 추가
-  // { key: "diet", title: "식단 기록", description: "매 끼니를 기록해요", href: "/diet", ready: false },
+  // { key: "diet", title: "식단 기록", description: "매 끼니를 기록해요", href: "/diet", ready: false, theme: MINT },
 ];
 
 export default function Home() {
@@ -86,7 +98,30 @@ export default function Home() {
         />
 
         <h1 className="mt-4 text-2xl font-bold text-[#7d4457]">{PROFILE.name}</h1>
-        <p className="mt-0.5 text-sm text-[#e05a86]">{PROFILE.handle}</p>
+        {/* 핸들을 누르면 깃허브로 이동해요.
+            target="_blank" : 새 탭에서 열기
+            rel="noopener noreferrer" : 새 탭이 원래 페이지를 건드리지 못하게 막는 안전장치 */}
+        <a
+          href={PROFILE.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-0.5 inline-flex items-center gap-1 text-sm text-[#e05a86] underline-offset-4 transition hover:underline"
+        >
+          {PROFILE.handle}
+          {/* 바깥으로 나가는 링크라는 표시 (작은 화살표) */}
+          <svg
+            className="h-3.5 w-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M14 4h6v6M20 4l-8 8M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" />
+          </svg>
+        </a>
 
         <p className="mt-3 text-sm font-semibold text-[#7d4457]">{PROFILE.role}</p>
         <p className="mt-1 text-sm leading-relaxed text-[#a07185]">{PROFILE.bio}</p>
@@ -111,23 +146,29 @@ export default function Home() {
         </h2>
 
         {PROJECTS.map((project) => {
+          const theme = project.theme; // 이 프로젝트의 색 묶음
+
           // 가로로 길쭉한 한 칸의 속 내용 (링크든 아니든 똑같이 생겼어요)
           const inner = (
-            <div className="flex w-full items-center gap-4 rounded-2xl border border-[#f8ccdd] bg-white px-5 py-4 shadow-sm">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ffe4ee] text-[#e05a86]">
+            <div
+              className={`flex w-full items-center gap-4 rounded-2xl border px-5 py-4 shadow-sm ${theme.box}`}
+            >
+              <span
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${theme.icon}`}
+              >
                 <BrainIcon className="h-6 w-6" />
               </span>
 
               {/* min-w-0 : 글이 길어져도 칸을 밀어내지 않고 말줄임(...) 되게 해줘요 */}
               <div className="min-w-0 flex-1 text-left">
-                <p className="truncate font-bold text-[#7d4457]">{project.title}</p>
-                <p className="truncate text-xs text-[#a07185]">{project.description}</p>
+                <p className={`truncate font-bold ${theme.title}`}>{project.title}</p>
+                <p className={`truncate text-xs ${theme.desc}`}>{project.description}</p>
               </div>
 
               {project.ready ? (
                 // 오른쪽 화살표 (들어갈 수 있다는 표시)
                 <svg
-                  className="h-5 w-5 shrink-0 text-[#e5a3bd]"
+                  className={`h-5 w-5 shrink-0 ${theme.arrow}`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -139,7 +180,9 @@ export default function Home() {
                   <path d="M9 6l6 6-6 6" />
                 </svg>
               ) : (
-                <span className="shrink-0 rounded-full bg-[#ffe4ee] px-2.5 py-1 text-[11px] font-medium text-[#c9698f]">
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${theme.icon}`}
+                >
                   준비 중
                 </span>
               )}

@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// 사이트 전체의 기본 탭 제목이에요.
+// 여기서 정한 제목이 로그인·프로젝트 선택 등 모든 페이지에 쓰이고,
+// 하위 폴더의 layout/page 에서 title 을 정하면 그 페이지만 덮어써져요.
 export const metadata: Metadata = {
-  title: "두통 기록 차트",
-  description: "두통과 투약 내용을 기록하는 개인 차트",
+  title: "world holicat",
+  description: "고양이가 지키는 나만의 기록 공간",
 };
 
 export default function RootLayout({

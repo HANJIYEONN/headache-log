@@ -57,7 +57,7 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center p-6">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#f0d9c2] bg-white p-8 text-center shadow-sm">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#f8ccdd] bg-white p-8 text-center shadow-sm">
         <div className="space-y-2">
           {/* 고양이 아이콘 배지 — 마우스를 올리거나 누르면 식빵→앉은 고양이로 바뀌어요 */}
           {/* group : 이 버튼에 마우스를 올리면 안쪽 요소들이 group-hover 로 반응해요 */}
@@ -70,7 +70,7 @@ export default function LoginPage() {
             }}
             title={catSitting ? '앉은 고양이 (다시 누르면 식빵)' : '식빵 고양이 (눌러보세요)'}
             aria-label="고양이 아이콘"
-            className="group mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fbefe2] text-[#c05f22] transition hover:bg-[#f7e2cd]"
+            className="group mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#ffe4ee] text-[#e05a86] transition hover:bg-[#ffd0e0]"
           >
             {/* 식빵 고양이: 평소엔 보이고, 마우스 올리면 숨어요 */}
             <CatIcon
@@ -81,7 +81,7 @@ export default function LoginPage() {
               className={`h-8 w-8 ${catSitting ? 'block' : 'hidden group-hover:block'}`}
             />
           </button>
-          <h1 className="text-xl font-bold text-[#d17a3f]">world-holicat</h1>
+          <h1 className="text-xl font-bold text-[#e05a86]">world-holicat</h1>
           <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
         </div>
 
@@ -92,7 +92,7 @@ export default function LoginPage() {
           <button
             type="button"
             tabIndex={-1}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#f0d9c2] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#fbefe2]"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#f8ccdd] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#ffe4ee]"
           >
             <GoogleGIcon />
             Google 계정으로 로그인

@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  /* 따뜻한 크림색 배경 — world-holicat 고양이 테마 */
-  --background: #fdf6ef;
-  --foreground: #4a3524;
+  /* 치이카와 파스텔 핑크 — world-holicat 기본 테마
+     (두통 기록 차트는 headache/layout.tsx 에서 민트 톤으로 덮어써요) */
+  --background: #fff4f8;
+  --foreground: #5c3040;
 }
 
 @theme inline {

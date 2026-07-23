@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BrainIcon from "@/components/BrainIcon";
+import CatIcon from "@/components/CatIcon";
 import LogoutIcon from "@/components/LogoutIcon";
 
 // 프로필 정보 — 여기 글자만 고치면 화면이 바로 바뀌어요
@@ -34,7 +35,17 @@ const MINT = {
   arrow: "text-[#8fd9c8]", // 오른쪽 화살표
 };
 
+// 고양이 수첩 디자인 시안에서 그대로 가져온 크림/노랑 색들
+const CATNOTE = {
+  box: "bg-white border-[#efe3c8]",
+  icon: "bg-[#fbefc9] text-[#b98a1f]",
+  title: "text-[#4a3a20]",
+  desc: "text-[#a08c66]",
+  arrow: "text-[#dccb9e]",
+};
+
 // 프로젝트 목록 — href가 있으면 들어갈 수 있고, ready:false면 "준비 중"
+// Icon : 칸 왼쪽에 들어갈 아이콘 컴포넌트 (프로젝트마다 다르게)
 const PROJECTS = [
   {
     key: "headache",
@@ -43,9 +54,17 @@ const PROJECTS = [
     href: "/headache",
     ready: true,
     theme: MINT,
+    Icon: BrainIcon,
   },
-  // 예시: 다음 프로젝트가 생기면 이런 식으로 추가
-  // { key: "diet", title: "식단 기록", description: "매 끼니를 기록해요", href: "/diet", ready: false, theme: MINT },
+  {
+    key: "cat-note",
+    title: "고양이 수첩",
+    description: "하루 다섯 문장 쓰는 글쓰기 수첩",
+    href: "/cat-note",
+    ready: true,
+    theme: CATNOTE,
+    Icon: CatIcon,
+  },
 ];
 
 export default function Home() {
@@ -147,6 +166,7 @@ export default function Home() {
 
         {PROJECTS.map((project) => {
           const theme = project.theme; // 이 프로젝트의 색 묶음
+          const Icon = project.Icon; // 이 프로젝트의 아이콘 (대문자로 시작해야 컴포넌트로 인식돼요)
 
           // 가로로 길쭉한 한 칸의 속 내용 (링크든 아니든 똑같이 생겼어요)
           const inner = (
@@ -156,7 +176,7 @@ export default function Home() {
               <span
                 className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${theme.icon}`}
               >
-                <BrainIcon className="h-6 w-6" />
+                <Icon className="h-6 w-6" />
               </span>
 
               {/* min-w-0 : 글이 길어져도 칸을 밀어내지 않고 말줄임(...) 되게 해줘요 */}

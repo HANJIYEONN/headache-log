@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import type { Entry } from "@/lib/api";
+import { useT } from "@/i18n/LanguageProvider";
 
 type Props = {
   entries: Entry[];
@@ -18,6 +19,7 @@ function ym(year: number, month: number) {
 }
 
 export default function EntryCalendar({ entries }: Props) {
+  const t = useT();
   const today = new Date();
   // 지금 보고 있는 연/월을 state로 기억 (◀ ▶ 버튼으로 바뀜)
   const [year, setYear] = useState(today.getFullYear());
@@ -60,21 +62,22 @@ export default function EntryCalendar({ entries }: Props) {
           onClick={() => moveMonth(-1)}
           className="rounded-lg border border-[#d4efe8] bg-white px-3 py-1 hover:bg-[#eef8f5]"
         >
-          이전 달
+          {t.headache.calendar.prevMonth}
         </button>
         <p className="font-bold text-[#1f4d44]">{ym(year, month)}</p>
         <button
           onClick={() => moveMonth(1)}
           className="rounded-lg border border-[#d4efe8] bg-white px-3 py-1 hover:bg-[#eef8f5]"
         >
-          다음 달
+          {t.headache.calendar.nextMonth}
         </button>
       </div>
 
       {/* 요일 줄 + 날짜 격자 (grid-cols-7 = 7칸씩) */}
       <div className="grid grid-cols-7 gap-1 text-center text-sm">
-        {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-          <div key={day} className="py-1 font-semibold text-gray-500">
+        {t.headache.calendar.weekdays.map((day, i) => (
+          // 언어에 따라 요일 이름이 겹칠 수 있어서(중국어의 "日"처럼) 순번을 key로 써요
+          <div key={i} className="py-1 font-semibold text-gray-500">
             {day}
           </div>
         ))}
@@ -95,7 +98,9 @@ export default function EntryCalendar({ entries }: Props) {
             >
               {day}
               {/* 기록 있는 날은 개수 표시 */}
-              {count > 0 && <span className="block text-[10px]">{count}건</span>}
+              {count > 0 && (
+                <span className="block text-[10px]">{t.headache.calendar.count(count)}</span>
+              )}
             </button>
           );
         })}
@@ -106,14 +111,18 @@ export default function EntryCalendar({ entries }: Props) {
         <div className="rounded-xl border border-[#d4efe8] bg-white p-4 text-sm">
           <p className="mb-2 font-bold text-[#1f4d44]">{selected}</p>
           {selectedEntries.length === 0 ? (
-            <p className="text-gray-500">이 날은 기록이 없어요.</p>
+            <p className="text-gray-500">{t.headache.calendar.noEntry}</p>
           ) : (
             selectedEntries.map((e) => (
               <p key={e.id} className="text-gray-700">
-                {e.medication ?? "약"} {e.dose_count ?? "-"}회 · 효과 {e.effective ? "있음" : "없음"}
+                {e.medication ?? t.headache.calendar.medicationFallback}{" "}
+                {t.headache.calendar.doseTimes(e.dose_count ?? "-")} ·{" "}
+                {t.headache.calendar.effectPrefix}{" "}
+                {e.effective ? t.headache.calendar.effectYes : t.headache.calendar.effectNo}
                 {e.trigger && ` · ${e.trigger}`}
-                {e.menstruating && " · 생리기간"}
-                {e.bp_systolic && ` · 혈압 ${e.bp_systolic}/${e.bp_diastolic}`}
+                {e.menstruating && ` · ${t.headache.calendar.periodTag}`}
+                {e.bp_systolic &&
+                  ` · ${t.headache.calendar.bpPrefix} ${e.bp_systolic}/${e.bp_diastolic}`}
               </p>
             ))
           )}

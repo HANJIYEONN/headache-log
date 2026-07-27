@@ -14,14 +14,14 @@ import Link from "next/link";
 import BrainIcon from "@/components/BrainIcon";
 import CatIcon from "@/components/CatIcon";
 import LogoutIcon from "@/components/LogoutIcon";
+import { PageTitle, useT } from "@/i18n/LanguageProvider";
 
-// 프로필 정보 — 여기 글자만 고치면 화면이 바로 바뀌어요
+// 프로필 정보 — 이름·기술 이름처럼 번역이 필요 없는 값만 여기 둬요.
+// 직업·소개처럼 번역이 필요한 글자는 i18n 사전(dictionaries.ts)에 있어요!
 const PROFILE = {
   name: "Han Jiyeon",
   handle: "@HANJIYEONN",
   github: "https://github.com/HANJIYEONN", // 핸들을 누르면 여기로 가요
-  role: "Full-stack Developer",
-  bio: "오늘도 무언가를 만들고 있습니다.",
   stack: ["Next.js", "TypeScript", "FastAPI", "MySQL"],
 };
 
@@ -44,30 +44,24 @@ const CATNOTE = {
   arrow: "text-[#dccb9e]",
 };
 
-// 프로젝트 목록 — href가 있으면 들어갈 수 있고, ready:false면 "준비 중"
+// 프로젝트 목록 — 제목·설명은 언어마다 달라지니까 여기 두지 않고,
+// 아래 컴포넌트 안에서 사전(t)을 보고 채워요.
+// href가 있으면 들어갈 수 있고, ready:false면 "준비 중"
 // Icon : 칸 왼쪽에 들어갈 아이콘 컴포넌트 (프로젝트마다 다르게)
 const PROJECTS = [
-  {
-    key: "headache",
-    title: "두통 기록 차트",
-    description: "투약 기록을 남기고 통계로 확인해요",
-    href: "/headache",
-    ready: true,
-    theme: MINT,
-    Icon: BrainIcon,
-  },
-  {
-    key: "cat-note",
-    title: "고양이 수첩",
-    description: "하루 다섯 문장 쓰는 글쓰기 수첩",
-    href: "/cat-note",
-    ready: true,
-    theme: CATNOTE,
-    Icon: CatIcon,
-  },
+  { key: "headache", href: "/headache", ready: true, theme: MINT, Icon: BrainIcon },
+  { key: "cat-note", href: "/cat-note", ready: true, theme: CATNOTE, Icon: CatIcon },
 ];
 
 export default function Home() {
+  const t = useT(); // 지금 언어의 사전
+
+  // 프로젝트 칸에 들어갈 글자 (언어가 바뀌면 이 값도 같이 바뀌어요)
+  const PROJECT_TEXT: Record<string, { title: string; description: string }> = {
+    headache: { title: t.home.headacheTitle, description: t.home.headacheDesc },
+    "cat-note": { title: t.home.catNoteTitle, description: t.home.catNoteDesc },
+  };
+
   // 로그인한 사용자 이름 (확인 끝나야 화면을 보여줘요)
   const [userName, setUserName] = useState<string | null>(null);
 
@@ -93,11 +87,14 @@ export default function Home() {
 
   return (
     <main className="relative mx-auto w-full max-w-md px-5 py-10">
+      {/* 브라우저 탭 제목 (언어에 따라 바뀌어요) */}
+      <PageTitle title={t.meta.site} />
+
       {/* 로그아웃 — 링크트리의 공유 버튼처럼 오른쪽 위 구석에 */}
       <button
         onClick={handleLogout}
-        title="로그아웃"
-        aria-label="로그아웃"
+        title={t.common.logout}
+        aria-label={t.common.logout}
         className="absolute right-5 top-10 rounded-full border border-[#f8ccdd] bg-white p-2.5 text-[#c9698f] shadow-sm transition hover:bg-[#ffe4ee]"
       >
         <LogoutIcon />
@@ -109,7 +106,7 @@ export default function Home() {
             next/image 는 사진 크기를 알아야 자리를 미리 잡아둘 수 있어서 width/height가 필요해요 */}
         <Image
           src="/avatar.png"
-          alt="프로필 사진"
+          alt={t.home.avatarAlt}
           width={112}
           height={112}
           priority
@@ -142,8 +139,8 @@ export default function Home() {
           </svg>
         </a>
 
-        <p className="mt-3 text-sm font-semibold text-[#7d4457]">{PROFILE.role}</p>
-        <p className="mt-1 text-sm leading-relaxed text-[#a07185]">{PROFILE.bio}</p>
+        <p className="mt-3 text-sm font-semibold text-[#7d4457]">{t.home.role}</p>
+        <p className="mt-1 text-sm leading-relaxed text-[#a07185]">{t.home.bio}</p>
 
         {/* 사용하는 기술들 — 작은 알약 모양 태그 */}
         <ul className="mt-4 flex flex-wrap justify-center gap-2">
@@ -161,12 +158,13 @@ export default function Home() {
       {/* ── 프로젝트 칸들 ─────────────────────────── */}
       <section className="mt-10 space-y-3">
         <h2 className="px-1 text-xs font-semibold uppercase tracking-wider text-[#c9698f]">
-          Projects
+          {t.home.projects}
         </h2>
 
         {PROJECTS.map((project) => {
           const theme = project.theme; // 이 프로젝트의 색 묶음
           const Icon = project.Icon; // 이 프로젝트의 아이콘 (대문자로 시작해야 컴포넌트로 인식돼요)
+          const text = PROJECT_TEXT[project.key]; // 지금 언어로 된 제목·설명
 
           // 가로로 길쭉한 한 칸의 속 내용 (링크든 아니든 똑같이 생겼어요)
           const inner = (
@@ -181,8 +179,8 @@ export default function Home() {
 
               {/* min-w-0 : 글이 길어져도 칸을 밀어내지 않고 말줄임(...) 되게 해줘요 */}
               <div className="min-w-0 flex-1 text-left">
-                <p className={`truncate font-bold ${theme.title}`}>{project.title}</p>
-                <p className={`truncate text-xs ${theme.desc}`}>{project.description}</p>
+                <p className={`truncate font-bold ${theme.title}`}>{text.title}</p>
+                <p className={`truncate text-xs ${theme.desc}`}>{text.description}</p>
               </div>
 
               {project.ready ? (
@@ -203,7 +201,7 @@ export default function Home() {
                 <span
                   className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${theme.icon}`}
                 >
-                  준비 중
+                  {t.home.comingSoon}
                 </span>
               )}
             </div>

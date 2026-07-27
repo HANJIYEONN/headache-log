@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────
 
 import type { Entry } from "@/lib/api";
+import { useT } from "@/i18n/LanguageProvider";
 
 type Props = {
   entries: Entry[];
@@ -15,8 +16,10 @@ type Props = {
 const BAR = "#178f76"; // 차트 막대 전용 민트 (연한 배경에서도 잘 보이는 진하기)
 
 export default function EntryCharts({ entries }: Props) {
+  const t = useT();
+
   if (entries.length === 0) {
-    return <p className="text-sm text-gray-500">기록이 쌓이면 통계를 보여드릴게요!</p>;
+    return <p className="text-sm text-gray-500">{t.headache.charts.empty}</p>;
   }
 
   // ── 1. 월별 두통 횟수: { "2026-07": 3, ... } ──
@@ -47,7 +50,7 @@ export default function EntryCharts({ entries }: Props) {
     <div className="space-y-6">
       {/* 월별 두통 횟수 — 세로 막대 + 세로축 눈금 */}
       <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-        <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">월별 두통 횟수</h3>
+        <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">{t.headache.charts.monthly}</h3>
         <div className="flex gap-2">
           {/* 세로축(y축) 숫자 — bottom %로 눈금 위치에 딱 맞춰요 */}
           <div className="relative h-32 w-5">
@@ -74,7 +77,11 @@ export default function EntryCharts({ entries }: Props) {
             {/* 막대들 — 눈금선 위에 겹쳐 그려요 */}
             <div className="absolute inset-0 flex items-end gap-2">
               {months.map((m) => (
-                <div key={m} className="flex h-full flex-1 items-end justify-center" title={`${m}: ${byMonth[m]}회`}>
+                <div
+                  key={m}
+                  className="flex h-full flex-1 items-end justify-center"
+                  title={`${m}: ${t.headache.charts.times(byMonth[m])}`}
+                >
                   <div
                     className="w-full max-w-10 rounded-t"
                     style={{ height: `${(byMonth[m] / axisMax) * 100}%`, backgroundColor: BAR }}
@@ -97,10 +104,16 @@ export default function EntryCharts({ entries }: Props) {
       {/* 촉발요인 분포 — 가로 막대 */}
       {triggers.length > 0 && (
         <div className="rounded-xl border border-[#d4efe8] bg-white p-4">
-          <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">촉발요인 TOP {triggers.length}</h3>
+          <h3 className="mb-3 text-sm font-bold text-[#1f4d44]">
+            {t.headache.charts.triggerTop(triggers.length)}
+          </h3>
           <div className="space-y-2">
             {triggers.map(([name, count]) => (
-              <div key={name} className="flex items-center gap-2 text-xs" title={`${name}: ${count}회`}>
+              <div
+                key={name}
+                className="flex items-center gap-2 text-xs"
+                title={`${name}: ${t.headache.charts.times(count)}`}
+              >
                 <span className="w-24 shrink-0 truncate text-gray-600">{name}</span>
                 <div className="h-4 flex-1 rounded bg-[#eef8f5]">
                   <div
@@ -108,7 +121,9 @@ export default function EntryCharts({ entries }: Props) {
                     style={{ width: `${(count / maxTrigger) * 100}%`, backgroundColor: BAR }}
                   />
                 </div>
-                <span className="w-8 text-right text-gray-600">{count}회</span>
+                <span className="w-8 text-right text-gray-600">
+                  {t.headache.charts.times(count)}
+                </span>
               </div>
             ))}
           </div>

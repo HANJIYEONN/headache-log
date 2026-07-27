@@ -6,10 +6,12 @@ import CatIcon from '@/components/CatIcon';
 import CatSittingIcon from '@/components/CatSittingIcon';
 import GoogleGIcon from '@/components/GoogleGIcon';
 import { playMeow } from '@/lib/meow';
+import { PageTitle, useT } from '@/i18n/LanguageProvider';
 
 const BUTTON_WIDTH = 280; // 커스텀 버튼과 실제 구글 버튼의 폭을 똑같이 맞춰요
 
 export default function LoginPage() {
+  const t = useT();
   const [error, setError] = useState('');
   // 고양이 아이콘: 기본은 식빵 자세 🍞, 클릭하면 앉은 자세로 고정
   // (마우스 올렸을 때 바뀌는 건 아래 CSS group-hover가 처리해요)
@@ -26,7 +28,7 @@ export default function LoginPage() {
     const idToken = credentialResponse.credential; // 구글이 준 ID 토큰
 
     if (!idToken) {
-      setError('구글 로그인에 실패했어요. 다시 시도해주세요.');
+      setError(t.login.errGoogle);
       return;
     }
 
@@ -48,15 +50,18 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(data.user));
         window.location.href = '/'; // 로그인 성공 → 메인 페이지로 이동
       } else {
-        setError('로그인 확인에 실패했어요. 잠시 후 다시 시도해주세요.');
+        setError(t.login.errVerify);
       }
-    } catch (error) {
-      setError('서버에 연결하지 못했어요. 백엔드가 켜져 있는지 확인해주세요.');
+    } catch {
+      setError(t.login.errServer);
     }
   };
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center p-6">
+      {/* 브라우저 탭 제목 (언어에 따라 바뀌어요) */}
+      <PageTitle title={t.meta.site} />
+
       <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[#f8ccdd] bg-white p-8 text-center shadow-sm">
         <div className="space-y-2">
           {/* 고양이 아이콘 배지 — 마우스를 올리거나 누르면 식빵→앉은 고양이로 바뀌어요 */}
@@ -68,8 +73,8 @@ export default function LoginPage() {
               playMeow(); // 폰에는 마우스가 없으니 탭할 때도 울어요
               setCatSitting((prev) => !prev);
             }}
-            title={catSitting ? '앉은 고양이 (다시 누르면 식빵)' : '식빵 고양이 (눌러보세요)'}
-            aria-label="고양이 아이콘"
+            title={catSitting ? t.login.catSitTitle : t.login.catBreadTitle}
+            aria-label={t.login.catAria}
             className="group mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#ffe4ee] text-[#e05a86] transition hover:bg-[#ffd0e0]"
           >
             {/* 식빵 고양이: 평소엔 보이고, 마우스 올리면 숨어요 */}
@@ -82,7 +87,7 @@ export default function LoginPage() {
             />
           </button>
           <h1 className="text-xl font-bold text-[#e05a86]">world-holicat</h1>
-          <p className="text-sm text-gray-500">구글 계정으로 로그인해주세요</p>
+          <p className="text-sm text-gray-500">{t.login.subtitle}</p>
         </div>
 
         {/* 구글 로그인 버튼 — 기본 버튼이 못생겨서, 예쁜 버튼을 위에 그리고
@@ -95,12 +100,12 @@ export default function LoginPage() {
             className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#f8ccdd] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#ffe4ee]"
           >
             <GoogleGIcon />
-            Google 계정으로 로그인
+            {t.login.googleButton}
           </button>
           <div className="absolute inset-0 overflow-hidden rounded-xl opacity-0">
             <GoogleLogin
               onSuccess={handleSuccess}
-              onError={() => setError('구글 로그인에 실패했어요. 다시 시도해주세요.')}
+              onError={() => setError(t.login.errGoogle)}
               width={BUTTON_WIDTH}
             />
           </div>

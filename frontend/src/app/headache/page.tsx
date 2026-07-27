@@ -22,17 +22,17 @@ import {
   type Entry,
   type FavoriteMedication,
 } from "@/lib/api";
+import { PageTitle, useT } from "@/i18n/LanguageProvider";
 
 // 탭 이름은 이 세 가지 중 하나만 가능하다고 타입으로 못박아요
 type Tab = "list" | "calendar" | "chart";
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "list", label: "목록" },
-  { key: "calendar", label: "달력" },
-  { key: "chart", label: "차트" },
-];
+// 탭에 보이는 글자는 언어마다 다르니까 열쇠(key)만 순서대로 적어둬요
+const TAB_KEYS: Tab[] = ["list", "calendar", "chart"];
 
 export default function Home() {
+  const t = useT();
+
   // 기록 목록을 기억하는 state
   const [entries, setEntries] = useState<Entry[]>([]);
   // 지금 열려 있는 탭
@@ -55,7 +55,7 @@ export default function Home() {
       return;
     }
     const user = localStorage.getItem("user");
-    setUserName(user ? JSON.parse(user).name : "사용자");
+    setUserName(user ? JSON.parse(user).name : "");
   }, []);
 
   // 로그아웃: 저장한 토큰을 지우고 로그인 페이지로
@@ -94,10 +94,10 @@ export default function Home() {
     setQuickAddMessage("");
     try {
       await quickAddEntry(favorite);
-      setQuickAddMessage(`${favorite.name} 기록을 오늘 목록에 추가했어요!`);
+      setQuickAddMessage(t.headache.fav.added(favorite.name));
       load();
     } catch {
-      setQuickAddMessage("추가에 실패했어요. 다시 시도해주세요.");
+      setQuickAddMessage(t.headache.fav.addFailed);
     }
   }
 
@@ -128,7 +128,7 @@ export default function Home() {
       if (editingFavorite?.id === id) setEditingFavorite(null);
       loadFavorites();
     } catch {
-      setQuickAddMessage("삭제에 실패했어요. 다시 시도해주세요.");
+      setQuickAddMessage(t.headache.fav.deleteFailed);
     }
   }
 
@@ -150,25 +150,28 @@ export default function Home() {
   return (
     // w-full : flex 부모 안에서 내용 크기에 따라 줄어들지 않고 항상 최대 폭 유지
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
+      {/* 브라우저 탭 제목 (언어에 따라 바뀌어요) */}
+      <PageTitle title={t.meta.headache} />
+
       <div className="flex items-start justify-between">
         {/* 제목 + 이름을 세로로 쌓아서 좁은 화면에서도 안 겹치게 */}
         <div>
-          <h1 className="text-2xl font-bold text-[#48a08e]">두통 기록 차트</h1>
-          <p className="mt-1 text-sm text-gray-600">{userName}님</p>
+          <h1 className="text-2xl font-bold text-[#48a08e]">{t.headache.title}</h1>
+          <p className="mt-1 text-sm text-gray-600">{t.headache.userSuffix(userName)}</p>
         </div>
         <div className="flex items-center gap-2">
           {/* 프로젝트 선택 화면(홈)으로 돌아가기 */}
           <Link
             href="/"
-            title="프로젝트 선택으로"
+            title={t.headache.homeTitle}
             className="rounded-lg border border-[#d4efe8] bg-white px-3 py-2 text-sm text-gray-500 hover:bg-[#eef8f5] hover:text-[#178f76]"
           >
-            홈
+            {t.common.home}
           </Link>
           <button
             onClick={handleLogout}
-            title="로그아웃"
-            aria-label="로그아웃"
+            title={t.common.logout}
+            aria-label={t.common.logout}
             className="rounded-lg border border-[#d4efe8] bg-white p-2 text-gray-500 hover:bg-[#eef8f5] hover:text-[#178f76]"
           >
             <LogoutIcon />
@@ -187,22 +190,22 @@ export default function Home() {
               >
                 <button
                   onClick={() => handleQuickAdd(fav)}
-                  title="누르면 오늘 복용 기록으로 저장돼요"
+                  title={t.headache.fav.takeTitle}
                   className="px-4 py-2 font-medium text-[#1f4d44] hover:bg-[#eef8f5]"
                 >
-                  {fav.name} 복용
+                  {t.headache.fav.take(fav.name)}
                 </button>
                 <button
                   onClick={() => handleEditFavorite(fav)}
                   className="border-l border-[#eef8f5] px-3 py-2 text-xs text-gray-400 hover:bg-[#eef8f5] hover:text-[#178f76]"
                 >
-                  수정
+                  {t.common.edit}
                 </button>
                 <button
                   onClick={() => handleDeleteFavorite(fav.id)}
                   className="border-l border-[#eef8f5] px-3 py-2 text-xs text-gray-400 hover:bg-[#eef8f5] hover:text-red-500"
                 >
-                  삭제
+                  {t.common.delete}
                 </button>
               </div>
             ))}
@@ -227,7 +230,7 @@ export default function Home() {
       <section className="space-y-4">
         {/* 탭 버튼 줄 — 지금 탭이면 진하게, 아니면 연하게 */}
         <div className="flex gap-2">
-          {TABS.map(({ key, label }) => (
+          {TAB_KEYS.map((key) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -237,7 +240,7 @@ export default function Home() {
                   : "bg-white text-gray-500 hover:bg-[#eef8f5]"
               }`}
             >
-              {label}
+              {t.headache.tabs[key]}
             </button>
           ))}
         </div>

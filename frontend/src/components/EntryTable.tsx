@@ -6,6 +6,7 @@
 // ─────────────────────────────────────────────
 
 import type { Entry } from "@/lib/api";
+import { useT } from "@/i18n/LanguageProvider";
 
 // "2026-07-18" → "07.18" (mm.dd 형식으로 짧게)
 function shortDate(dateStr: string): string {
@@ -19,8 +20,10 @@ type Props = {
 };
 
 export default function EntryTable({ entries, onDelete, onEdit }: Props) {
+  const t = useT();
+
   if (entries.length === 0) {
-    return <p className="text-sm text-gray-500">아직 기록이 없어요. 첫 기록을 남겨보세요!</p>;
+    return <p className="text-sm text-gray-500">{t.headache.table.empty}</p>;
   }
 
   return (
@@ -30,13 +33,13 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
         {/* thead = 표의 머리(제목 줄) */}
         <thead>
           <tr className="border-b border-[#d4efe8] bg-[#eef8f5] text-left text-[#1f4d44]">
-            <th className="p-3 font-semibold">날짜</th>
-            <th className="p-3 font-semibold">약 종류</th>
-            <th className="p-3 font-semibold">복용횟수</th>
-            <th className="p-3 font-semibold">효과</th>
-            <th className="p-3 font-semibold">촉발요인</th>
-            <th className="p-3 font-semibold">생리</th>
-            <th className="p-3 font-semibold">혈압</th>
+            <th className="p-3 font-semibold">{t.headache.table.date}</th>
+            <th className="p-3 font-semibold">{t.headache.table.medication}</th>
+            <th className="p-3 font-semibold">{t.headache.table.doseCount}</th>
+            <th className="p-3 font-semibold">{t.headache.table.effect}</th>
+            <th className="p-3 font-semibold">{t.headache.table.trigger}</th>
+            <th className="p-3 font-semibold">{t.headache.table.period}</th>
+            <th className="p-3 font-semibold">{t.headache.table.bp}</th>
             <th className="p-3"></th>
           </tr>
         </thead>
@@ -46,7 +49,7 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
             <tr key={entry.id} className="border-b border-[#eef8f5] last:border-0">
               <td className="p-3 font-medium">{shortDate(entry.entry_date)}</td>
               <td className="p-3">{entry.medication ?? "-"}</td>
-              <td className="p-3">{entry.dose_count ?? "-"}회</td>
+              <td className="p-3">{t.headache.table.doseValue(entry.dose_count ?? "-")}</td>
               <td className="p-3">{entry.effective ? "O" : "X"}</td>
               <td className="p-3">{entry.trigger ?? "-"}</td>
               <td className="p-3">{entry.menstruating ? "O" : "-"}</td>
@@ -60,13 +63,13 @@ export default function EntryTable({ entries, onDelete, onEdit }: Props) {
                   onClick={() => onEdit(entry)}
                   className="mr-2 text-xs text-gray-400 hover:text-[#178f76]"
                 >
-                  수정
+                  {t.common.edit}
                 </button>
                 <button
                   onClick={() => onDelete(entry.id)}
                   className="text-xs text-gray-400 hover:text-red-500"
                 >
-                  삭제
+                  {t.common.delete}
                 </button>
               </td>
             </tr>

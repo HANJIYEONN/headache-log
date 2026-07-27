@@ -18,6 +18,7 @@ import {
   type NewEntry,
   type NewFavorite,
 } from "@/lib/api";
+import { useT } from "@/i18n/LanguageProvider";
 
 const MAX_FAVORITES = 3;
 
@@ -60,6 +61,8 @@ export default function EntryForm({
   editingFavorite,
   onCancelFavoriteEdit,
 }: Props) {
+  const t = useT(); // 지금 언어의 사전 (t.headache.form 아래에 이 폼 글자들이 있어요)
+
   // ── state : 컴포넌트가 "기억하는 값" ──
   // form 값이 바뀔 때마다 React가 화면을 자동으로 다시 그려줘요 ✨
   const [form, setForm] = useState<NewEntry>(emptyForm());
@@ -109,12 +112,12 @@ export default function EntryForm({
   async function handleSaveFavorite() {
     const name = form.medication?.trim();
     if (!name) {
-      setMessage("약 종류를 먼저 입력해주세요");
+      setMessage(t.headache.form.needMedication);
       return;
     }
     // 새로 추가하는 경우에만 3개 제한 검사 (수정은 개수가 안 늘어나니까!)
     if (!editingFavorite && favorites.length >= MAX_FAVORITES) {
-      setMessage(`자주 복용하는 약은 최대 ${MAX_FAVORITES}개까지예요`);
+      setMessage(t.headache.form.favLimit(MAX_FAVORITES));
       return;
     }
     // 저장 버튼과 같은 규칙: 혈압 체크가 꺼져 있으면 혈압 값은 비워서 저장
@@ -131,17 +134,18 @@ export default function EntryForm({
     try {
       if (editingFavorite) {
         await updateFavorite(editingFavorite.id, favorite);
-        setMessage(`자주 복용하는 약 "${name}"을(를) 수정했어요!`);
+        setMessage(t.headache.form.favUpdated(name));
         onCancelFavoriteEdit(); // 수정 모드 끝내기
       } else {
         await addFavorite(favorite);
-        setMessage(`자주 복용하는 약에 "${name}"을(를) 추가했어요!`);
+        setMessage(t.headache.form.favAdded(name));
       }
       setForm(emptyForm());
       setRecordBp(false);
       onFavoritesChanged(); // 부모에게 "즐겨찾기 목록 새로고침해줘" 알리기
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "즐겨찾기 저장에 실패했어요");
+      // 백엔드가 보내준 설명이 있으면 그대로 보여주고, 없으면 번역된 문구로
+      setMessage(err instanceof Error ? err.message : t.headache.form.favSaveFailed);
     }
   }
 
@@ -162,10 +166,10 @@ export default function EntryForm({
       }
       setForm(emptyForm());       // 폼 비우기
       setRecordBp(false);
-      setMessage(editing ? "수정했어요!" : "저장했어요!");
+      setMessage(editing ? t.headache.form.savedEdit : t.headache.form.savedNew);
       onSaved();                 // 부모에게 "저장했어!" 알리기
     } catch {
-      setMessage("저장에 실패했어요. 백엔드가 켜져 있는지 확인해주세요.");
+      setMessage(t.headache.form.saveFailed);
     } finally {
       setSaving(false);
     }
@@ -176,15 +180,15 @@ export default function EntryForm({
     <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#d4efe8] bg-white p-6 text-gray-900 shadow-sm">
       <h2 className="text-lg font-bold text-[#48a08e]">
         {editing
-          ? `기록 수정 (${editing.entry_date})`
+          ? t.headache.form.titleEdit(editing.entry_date)
           : editingFavorite
-          ? `자주 복용하는 약 수정 (${editingFavorite.name})`
-          : "오늘의 두통 기록"}
+          ? t.headache.form.titleEditFav(editingFavorite.name)
+          : t.headache.form.titleNew}
       </h2>
 
       {/* 날짜 */}
       <label className="block">
-        <span className="text-sm font-medium">날짜</span>
+        <span className="text-sm font-medium">{t.headache.form.date}</span>
         <input
           type="date"
           value={form.entry_date}
@@ -197,7 +201,7 @@ export default function EntryForm({
       {/* 약 종류 */}
       <label className="block">
         <span className="text-sm font-medium">
-          약 종류 <span className="text-[#6cbfae]">*</span>
+          {t.headache.form.medication} <span className="text-[#6cbfae]">*</span>
         </span>
         <input
           type="text"
@@ -220,7 +224,7 @@ export default function EntryForm({
       <div className="flex gap-4">
         <label className="block flex-1">
           <span className="text-sm">
-            복용횟수 <span className="text-[#6cbfae]">*</span>
+            {t.headache.form.doseCount} <span className="text-[#6cbfae]">*</span>
           </span>
           <input
             type="number"
@@ -237,16 +241,16 @@ export default function EntryForm({
             checked={form.effective === true}
             onChange={(e) => update("effective", e.target.checked)}
           />
-          <span className="text-sm">효과 있었음</span>
+          <span className="text-sm">{t.headache.form.effective}</span>
         </label>
       </div>
 
       {/* 촉발요인 */}
       <label className="block">
-        <span className="text-sm font-medium">촉발요인</span>
+        <span className="text-sm font-medium">{t.headache.form.trigger}</span>
         <input
           type="text"
-          placeholder="예: 수면 부족, 스트레스, 카페인..."
+          placeholder={t.headache.form.triggerPlaceholder}
           value={form.trigger ?? ""}
           onChange={(e) => update("trigger", e.target.value || null)}
           className="mt-1 w-full rounded-lg border p-2"
@@ -260,13 +264,13 @@ export default function EntryForm({
           checked={recordBp}
           onChange={(e) => setRecordBp(e.target.checked)}
         />
-        <span className="text-sm">혈압도 기록하기</span>
+        <span className="text-sm">{t.headache.form.recordBp}</span>
       </label>
 
       {recordBp && (
       <div className="grid grid-cols-3 gap-3 rounded-lg bg-[#eef8f5] p-3">
         <label className="block">
-          <span className="text-sm">수축기</span>
+          <span className="text-sm">{t.headache.form.systolic}</span>
           <input
             type="number"
             placeholder="120"
@@ -276,7 +280,7 @@ export default function EntryForm({
           />
         </label>
         <label className="block">
-          <span className="text-sm">이완기</span>
+          <span className="text-sm">{t.headache.form.diastolic}</span>
           <input
             type="number"
             placeholder="80"
@@ -286,7 +290,7 @@ export default function EntryForm({
           />
         </label>
         <label className="block">
-          <span className="text-sm">맥박수</span>
+          <span className="text-sm">{t.headache.form.pulse}</span>
           <input
             type="number"
             placeholder="75"
@@ -305,7 +309,7 @@ export default function EntryForm({
           checked={form.menstruating}
           onChange={(e) => update("menstruating", e.target.checked)}
         />
-        <span className="text-sm">생리기간</span>
+        <span className="text-sm">{t.headache.form.menstruating}</span>
       </label>
 
       {/* 저장/취소 버튼 — 모드에 따라 다르게 보여요
@@ -319,7 +323,11 @@ export default function EntryForm({
             disabled={saving}
             className="flex-1 rounded-xl bg-[#a7e3d5] py-2.5 font-semibold text-[#1f4d44] transition hover:bg-[#8fd9c8] disabled:opacity-50"
           >
-            {saving ? "저장 중..." : editing ? "수정 저장하기" : "기록 저장하기"}
+            {saving
+              ? t.headache.form.saving
+              : editing
+              ? t.headache.form.saveEdit
+              : t.headache.form.saveNew}
           </button>
         )}
         {!editing && (
@@ -328,7 +336,7 @@ export default function EntryForm({
             onClick={handleSaveFavorite}
             className="flex-1 rounded-xl border border-[#a7e3d5] bg-white py-2.5 text-sm font-semibold text-[#1f4d44] transition hover:bg-[#eef8f5]"
           >
-            {editingFavorite ? "자주 복용하는 약 수정하기" : "자주 복용하는 약 저장하기"}
+            {editingFavorite ? t.headache.form.editFav : t.headache.form.saveFav}
           </button>
         )}
         {editing && (
@@ -337,7 +345,7 @@ export default function EntryForm({
             onClick={onCancelEdit}
             className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
           >
-            취소
+            {t.common.cancel}
           </button>
         )}
         {editingFavorite && (
@@ -346,7 +354,7 @@ export default function EntryForm({
             onClick={onCancelFavoriteEdit}
             className="rounded-xl border border-[#d4efe8] bg-white px-4 py-2.5 text-sm text-gray-500 hover:bg-[#eef8f5]"
           >
-            취소
+            {t.common.cancel}
           </button>
         )}
       </div>

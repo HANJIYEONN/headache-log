@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { LanguageProvider } from "@/i18n/LanguageProvider";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,9 +34,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
-          {children}
-        </GoogleOAuthProvider>
+        {/* LanguageProvider 로 감싸야 안쪽 모든 화면에서 useT() 를 쓸 수 있어요.
+            언어 전환 버튼도 여기 두면 모든 페이지에 한 번에 나와요 */}
+        <LanguageProvider>
+          <LanguageSwitcher />
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+            {children}
+          </GoogleOAuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

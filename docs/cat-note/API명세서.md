@@ -1,0 +1,371 @@
+# 🔌 고양이 수첩 — API 명세서
+
+| 문서 정보 | 내용 |
+|---|---|
+| 버전 | v0.1 (초안) |
+| 작성일 | 2026-08-02 |
+| 기준 | 요구사항 정의서 v0.3, DB설계 v0.1, 결정 D-01~D-12 |
+| 서버 | 기존 FastAPI 백엔드 안에 추가 |
+
+---
+
+## 0. 공통 규칙
+
+**주소 앞부분**: 모든 주소는 `/api/v1/cat-note` 로 시작해요. (아래 표에서는 이 부분을 생략)
+
+**로그인 확인**: 모든 요청에 기존 구글 로그인 토큰을 붙여요.
+```
+Authorization: Bearer <access_token>
+```
+
+**HTTP 방식** — 이 4가지만 써요:
+
+| 방식 | 뜻 | 예시 |
+|---|---|---|
+| `GET` | 가져오기 | 오늘 수첩 보여줘 |
+| `POST` | 새로 만들기 | 친구 신청할래 |
+| `PUT` | 통째로 바꾸기 | 3번째 문장을 이걸로 |
+| `PATCH` | 일부만 바꾸기 | 별명만 바꿀래 |
+| `DELETE` | 지우기 | 친구 끊을래 |
+
+**응답 코드**
+
+| 코드 | 뜻 |
+|---|---|
+| 200 | 잘 됨 |
+| 201 | 새로 만들어짐 |
+| 400 | 보낸 값이 잘못됨 (예: 아이디가 3글자) |
+| 401 | 로그인이 안 됨 / 토큰 만료 |
+| 403 | 권한 없음 (예: 친구 아닌 사람의 수첩 보기) |
+| 404 | 없는 것을 찾음 |
+| 409 | 이미 있음 (예: 중복된 수첩 아이디) |
+
+**오류 응답 모양** — 항상 이 형태로 돌려줘요:
+```json
+{ "detail": "이미 있는 아이디예요" }
+```
+
+---
+
+## 1. 계정 (첫 진입 · 내 정보)
+
+### 1-1. 내 계정 확인 — `GET /me`
+
+고양이 수첩에 들어올 때 **제일 먼저** 부르는 API예요. 계정이 있으면 홈으로, 없으면 모드 선택 화면으로 보내요.
+
+**응답 200** (계정 있음)
+```json
+{
+  "exists": true,
+  "note_id": "jiwoo07",
+  "role": "child",
+  "nickname": "지우",
+  "bio": "그림 그리기를 좋아해요",
+  "avatar": "cat",
+  "learning_language": "ko",
+  "feedback_language": null,
+  "level": null,
+  "daily_reminder": false
+}
+```
+
+**응답 200** (계정 없음 → 온보딩으로)
+```json
+{ "exists": false }
+```
+
+### 1-2. 수첩 아이디 쓸 수 있나 확인 — `GET /note-id/check?value=jiwoo07`
+
+입력칸에 타이핑할 때마다 부르는 게 아니라, **잠깐 멈췄을 때** 한 번 부르는 게 좋아요.
+
+**응답 200**
+```json
+{
+  "available": false,
+  "reason": "duplicate",
+  "suggestions": ["jiwoo7", "happyjiwoo", "jiwoo0720"]
+}
+```
+
+| `reason` 값 | 뜻 |
+|---|---|
+| `null` | 쓸 수 있어요 (available: true) |
+| `duplicate` | 이미 있는 아이디 |
+| `too_short` / `too_long` | 4자 미만 / 15자 초과 |
+| `invalid_char` | 영문·숫자 말고 다른 글자가 있음 |
+
+### 1-3. 계정 만들기 — `POST /me`
+
+모드 선택 + 수첩 아이디를 다 정하고 **"수첩 만들기"** 누를 때.
+
+**요청**
+```json
+{
+  "role": "child",
+  "note_id": "jiwoo07",
+  "nickname": "지우",
+  "learning_language": "ko"
+}
+```
+
+**응답 201** — 1-1과 같은 모양
+**응답 409** — `{ "detail": "이미 있는 아이디예요" }`
+
+> ⚠️ `role`은 여기서 딱 한 번만 정해요. 나중에 못 바꿔요 (D-09).
+
+### 1-4. 내 정보 수정 — `PATCH /me`
+
+**요청** (바꿀 것만 보내면 돼요)
+```json
+{ "nickname": "지우", "bio": "그림 좋아해요", "avatar": "dino" }
+```
+
+**바꿀 수 있는 것**: `nickname`, `bio`, `avatar`, `learning_language`, `feedback_language`, `daily_reminder`
+**못 바꾸는 것**: `role`(D-09), `note_id`(친구가 못 찾게 되니까)
+
+---
+
+## 2. 수첩 쓰기 ⭐ (핵심)
+
+### 2-1. 오늘 수첩 가져오기 — `GET /entries/today`
+
+홈 화면과 쓰기 화면에서 써요. 오늘 것이 없으면 빈 수첩을 만들어서 돌려줘요.
+
+**응답 200**
+```json
+{
+  "entry_id": 12,
+  "entry_date": "2026-08-02",
+  "is_complete": false,
+  "accuracy": null,
+  "sentences": [
+    { "position": 1, "text": "오늘의 하늘은 푸르다", "input_method": "keyboard" },
+    { "position": 2, "text": "고양이가 조아요", "input_method": "keyboard" },
+    { "position": 3, "text": "아침에 우유를 마셨다", "input_method": "voice" }
+  ]
+}
+```
+
+> 💡 아직 완성 전이라 **교정 결과가 없어요.** 쓰는 중엔 교정을 안 보여주기로 했으니까요 (D-12).
+
+### 2-2. 문장 저장 — `PUT /entries/today/sentences/{position}`
+
+`position`은 1~5. 문장을 쓰거나 고칠 때마다 바로 저장해요 (NF-06 — 글이 유실되면 안 됨).
+
+**요청**
+```json
+{ "text": "학교에서 그림을 그렸다", "input_method": "keyboard" }
+```
+
+**응답 200**
+```json
+{ "position": 4, "text": "학교에서 그림을 그렸다", "saved_at": "2026-08-02T21:14:00" }
+```
+
+### 2-3. 다 썼어요! (AI 채점) — `POST /entries/today/complete`
+
+**여기서만 AI를 불러요** (D-12). 5문장을 통째로 AI에게 보내서 한 번에 채점받아요.
+
+**요청**: 없음 (저장된 5문장을 서버가 알아서 씀)
+
+**응답 200**
+```json
+{
+  "entry_id": 12,
+  "is_complete": true,
+  "accuracy": 80,
+  "sentences": [
+    {
+      "position": 1,
+      "original_text": "오늘의 하늘은 푸르다",
+      "corrected_text": null,
+      "corrections": []
+    },
+    {
+      "position": 2,
+      "original_text": "고양이가 조아요",
+      "corrected_text": "고양이가 좋아요",
+      "corrections": [
+        {
+          "wrong_text": "조아요",
+          "right_text": "좋아요",
+          "note": "'좋다'의 어간은 좋-이고 ㅎ 받침을 유지해요.",
+          "pronunciation": "[조아요]"
+        }
+      ]
+    }
+  ],
+  "new_expressions": ["좋아요"],
+  "streak_days": 8,
+  "total_stamps": 33
+}
+```
+
+**응답 400** — 5문장을 다 안 썼을 때 `{ "detail": "아직 다 못 썼어요 (3/5)" }`
+
+> ⏱️ AI 응답이 몇 초 걸릴 수 있어요. 화면에 "콩이가 읽는 중..." 같은 로딩을 꼭 보여주세요.
+
+### 2-4. 오늘의 글감 — `GET /prompts/today`
+
+**응답 200**
+```json
+{ "prompt": "누구랑 놀았는지 써 볼까?" }
+```
+
+---
+
+## 3. 기록 보기 (달력 · 통계)
+
+### 3-1. 월별 기록 — `GET /entries?year=2026&month=7`
+
+달력 화면용. 어느 날에 발도장이 있는지 알려줘요.
+
+**응답 200**
+```json
+{
+  "days": [
+    { "date": "2026-07-01", "is_complete": true, "accuracy": 80 },
+    { "date": "2026-07-02", "is_complete": true, "accuracy": 100 }
+  ],
+  "total_stamps_this_month": 15
+}
+```
+
+### 3-2. 특정 날짜 상세 — `GET /entries/{date}`
+
+예: `/entries/2026-07-20`. 응답은 2-3과 같은 모양 (교정 포함).
+
+### 3-3. 통계 — `GET /stats`
+
+홈 화면의 숫자 카드들. **저장된 값이 아니라 그때그때 세는 값**이에요.
+
+**응답 200**
+```json
+{
+  "streak_days": 7,
+  "total_stamps": 32,
+  "praises_received": 12,
+  "weekly_accuracy": 86,
+  "weekly_accuracy_diff": 6,
+  "vocab_count": 124,
+  "level": "중급 1",
+  "expressions_to_next_level": 26
+}
+```
+
+> 어린이 모드는 `streak_days`·`total_stamps`만, 어른 모드는 정확도·레벨까지 써요.
+
+---
+
+## 4. 친구
+
+### 4-1. 수첩 아이디로 찾기 — `GET /users/search?note_id=minjun22`
+
+**정확히 일치할 때만** 찾아져요. 부분 검색은 안 돼요 (NF-04).
+
+**응답 200**
+```json
+{ "found": true, "note_id": "minjun22", "nickname": "민준", "avatar": "cat" }
+```
+**응답 200** (없을 때) — `{ "found": false }`
+
+### 4-2. 친구 목록 — `GET /friends`
+
+```json
+{
+  "friends": [
+    { "note_id": "minjun22", "nickname": "민준", "avatar": "cat" }
+  ],
+  "pending_received": [
+    { "friendship_id": 7, "note_id": "hajun9", "nickname": "하준" }
+  ]
+}
+```
+
+### 4-3. 친구 신청 — `POST /friends`
+요청: `{ "note_id": "minjun22" }` → 응답 201
+**409** — 이미 친구이거나 신청함
+
+### 4-4. 수락 — `POST /friends/{friendship_id}/accept`
+### 4-5. 거절·삭제 — `DELETE /friends/{friendship_id}`
+
+### 4-6. 친구 피드 — `GET /friends/feed`
+
+친구들의 **오늘** 수첩. 어른 모드는 국기·배우는 언어도 같이.
+
+```json
+{
+  "feed": [
+    {
+      "entry_id": 88,
+      "note_id": "minjun22",
+      "nickname": "민준",
+      "avatar": "cat",
+      "country": "KR",
+      "learning_language": "ko",
+      "status": "complete",
+      "progress": "5/5",
+      "written_at": "10분 전",
+      "sentences": ["나는 사과를 먹었다", "친구와 축구를 했다"],
+      "praise_count": 3,
+      "i_praised": false
+    }
+  ]
+}
+```
+
+> 🔒 친구가 아닌 사람의 수첩을 부르면 **403**을 돌려줘야 해요.
+
+### 4-7. 칭찬도장 주기 — `POST /entries/{entry_id}/praises`
+응답 201 `{ "praise_count": 4 }` · **409** 이미 준 경우
+
+### 4-8. 댓글 목록 — `GET /entries/{entry_id}/comments`
+### 4-9. 댓글 쓰기 — `POST /entries/{entry_id}/comments`
+요청: `{ "content": "잘 썼다!" }` (200자 이내)
+
+> 비속어 필터는 2차에 이 API 안에 넣으면 돼요 (D-07).
+
+---
+
+## 5. 단어장 (어른 모드)
+
+| 주소 | 방식 | 하는 일 |
+|---|---|---|
+| `/vocab` | GET | 저장한 표현 목록 |
+| `/vocab` | POST | 표현 저장 `{ "correction_id": 5 }` |
+| `/vocab/{id}` | DELETE | 지우기 |
+
+---
+
+## 6. 나중에 만들 것
+
+| 주소 | 하는 일 | 언제 |
+|---|---|---|
+| `POST /tts` | 발음 듣기 (LEARN-06) | 방식 미정 |
+| `POST /translate` | 번역 보기 (LEARN-07) | 방식 미정 |
+| `GET /corrections/similar` | 비슷한 실수 3개 (LEARN-04) | 나중에 |
+
+---
+
+## 7. 화면 ↔ API 연결표
+
+| 화면 | 부르는 API |
+|---|---|
+| 첫 진입 | `GET /me` |
+| 모드 선택 → 아이디 만들기 | `GET /note-id/check` → `POST /me` |
+| 홈 | `GET /entries/today` + `GET /stats` |
+| 쓰기 | `GET /prompts/today` + `PUT .../sentences/{n}` |
+| 다 썼어요! | `POST /entries/today/complete` |
+| 오늘 모아보기 | 위 응답 그대로 사용 (다시 안 불러도 됨) |
+| 달력 | `GET /entries?year=&month=` → 날짜 클릭 시 `GET /entries/{date}` |
+| 친구 | `GET /friends/feed` · `GET /friends` |
+| 친구 찾기 | `GET /users/search` → `POST /friends` |
+| 내 정보 | `GET /me` → `PATCH /me` |
+
+---
+
+## 8. 아직 정할 것
+
+- [ ] 하루가 바뀌는 기준 시각 — `today`의 기준 (밤 12시? 새벽 4시?)
+- [ ] AI 채점이 실패했을 때 처리 (문장은 저장됐는데 채점만 실패한 경우)
+- [ ] 친구 수 상한을 둘지

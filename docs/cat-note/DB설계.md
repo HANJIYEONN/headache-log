@@ -52,16 +52,17 @@ erDiagram
 | `id` | BIGINT PK | 자동 번호 |
 | `user_id` | BIGINT FK → 기존 `users.id` | 두통 기록에서 쓰는 구글 사용자 테이블과 연결 |
 | `note_id` | VARCHAR(15) UNIQUE | 수첩 아이디. 영문+숫자 4~15자, **소문자로 변환해 저장** (D-10) |
-| `role` | ENUM('child','adult') | 아이 / 어른. **한 번 정하면 못 바꿈** (D-09) |
-| `nickname` | VARCHAR(20) | 별명. 어린이 8자 / 어른 20자 |
+| `partner` | ENUM('kongi','cheese','meokmul','sikppang') | **짝꿍** — 콩이/치즈/먹물이/식빵이. 말투와 난이도를 정함. **한 번 정하면 못 바꿈** (D-09, D-13) |
+| `nickname` | VARCHAR(20) | 별명 (8자 제한은 화면에서) |
 | `bio` | VARCHAR(100) NULL | 나를 소개하는 한 문장 |
-| `avatar` | VARCHAR(20) | 아바타 종류 (cat/dog/dino/rabbit/photo) |
-| `avatar_url` | VARCHAR(255) NULL | 사진을 올렸을 때만 |
+| `avatar` | ENUM('cat','dog','rabbit','dino') | 동반 동물 |
 | `learning_language` | CHAR(2) | 배우는 언어 (ko/en/ja/zh) |
-| `feedback_language` | CHAR(2) NULL | 문법 설명을 받을 언어 (어른 모드) |
-| `level` | VARCHAR(20) NULL | 초급1/중급1 등 (어른 모드) |
+| `feedback_language` | CHAR(2) NULL | 교정 설명·번역을 받을 언어 |
+| `writing_stage` | TINYINT | 내 단계 (1,2,3…) — **어린이·어른 공통** (D-14) |
 | `daily_reminder` | BOOLEAN | 매일 알림 켜기 (기본 false) |
 | `created_at` | DATETIME | 만든 시각 |
+
+> 💡 **`role` 칸이 사라졌어요.** 아이/어른 2택이 짝꿍 4명 선택으로 바뀌면서(D-13), `partner` 하나로 말투·난이도·화면 모드를 다 판단해요.
 
 > 💡 **왜 기존 `users`와 나눴나요?** 두통 기록만 쓰는 사람도 있으니까요. 고양이 수첩에 들어온 사람만 이 테이블에 줄이 생겨요.
 

@@ -58,16 +58,19 @@ Authorization: Bearer <access_token>
 {
   "exists": true,
   "note_id": "jiwoo07",
-  "role": "child",
+  "partner": "kongi",
   "nickname": "지우",
   "bio": "그림 그리기를 좋아해요",
   "avatar": "cat",
   "learning_language": "ko",
-  "feedback_language": null,
-  "level": null,
+  "feedback_language": "ko",
+  "writing_stage": 3,
+  "sentences_to_next_stage": 26,
   "daily_reminder": false
 }
 ```
+
+> `partner` 값: `kongi`(콩이·초등 이하) / `cheese`(치즈·중고등) / `meokmul`(먹물이·어른) / `sikppang`(식빵이·누구나)
 
 **응답 200** (계정 없음 → 온보딩으로)
 ```json
@@ -101,7 +104,7 @@ Authorization: Bearer <access_token>
 **요청**
 ```json
 {
-  "role": "child",
+  "partner": "kongi",
   "note_id": "jiwoo07",
   "nickname": "지우",
   "learning_language": "ko"
@@ -111,7 +114,7 @@ Authorization: Bearer <access_token>
 **응답 201** — 1-1과 같은 모양
 **응답 409** — `{ "detail": "이미 있는 아이디예요" }`
 
-> ⚠️ `role`은 여기서 딱 한 번만 정해요. 나중에 못 바꿔요 (D-09).
+> ⚠️ `partner`는 여기서 딱 한 번만 정해요. 나중에 못 바꿔요 (D-09, D-13).
 
 ### 1-4. 내 정보 수정 — `PATCH /me`
 
@@ -121,7 +124,7 @@ Authorization: Bearer <access_token>
 ```
 
 **바꿀 수 있는 것**: `nickname`, `bio`, `avatar`, `learning_language`, `feedback_language`, `daily_reminder`
-**못 바꾸는 것**: `role`(D-09), `note_id`(친구가 못 찾게 되니까)
+**못 바꾸는 것**: `partner`(D-09·D-13), `note_id`(친구가 못 찾게 되니까)
 
 ---
 

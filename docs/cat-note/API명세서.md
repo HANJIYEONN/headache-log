@@ -157,12 +157,12 @@ Authorization: Bearer <access_token>
 
 **요청**
 ```json
-{ "text": "학교에서 그림을 그렸다", "input_method": "keyboard" }
+{ "text": "학교에서 그림을 그렸다" }
 ```
 
 **응답 200**
 ```json
-{ "position": 4, "text": "학교에서 그림을 그렸다", "saved_at": "2026-08-02T21:14:00" }
+{ "position": 4, "text": "학교에서 그림을 그렸다", "saved_at": "2026-08-06T21:14:00" }
 ```
 
 ### 2-3. 다 썼어요! (AI 채점) — `POST /entries/today/complete`
@@ -344,7 +344,6 @@ Authorization: Bearer <access_token>
 
 | 주소 | 하는 일 | 언제 |
 |---|---|---|
-| `POST /tts` | 발음 듣기 (LEARN-06) | 방식 미정 |
 | `POST /translate` | 번역 보기 (LEARN-07) | 방식 미정 |
 | `GET /corrections/similar` | 비슷한 실수 3개 (LEARN-04) | 나중에 |
 

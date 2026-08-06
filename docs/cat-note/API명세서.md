@@ -123,8 +123,8 @@ Authorization: Bearer <access_token>
 { "nickname": "지우", "bio": "그림 좋아해요", "avatar": "dino" }
 ```
 
-**바꿀 수 있는 것**: `nickname`, `bio`, `avatar`, `learning_language`, `feedback_language`, `daily_reminder`
-**못 바꾸는 것**: `partner`(D-09·D-13), `note_id`(친구가 못 찾게 되니까)
+**바꿀 수 있는 것**: `nickname`, `bio`, `avatar`, `learning_language`, `feedback_language`, `daily_reminder`, **`partner`**(말투 즉시 변경 — D-17)
+**못 바꾸는 것**: `note_id`(친구가 못 찾게 되니까)
 
 ---
 
@@ -372,4 +372,6 @@ Authorization: Bearer <access_token>
 - [x] 하루가 바뀌는 기준 시각 → **밤 12시(자정)** 기준, 서버의 한국 시간대로 판정 (D-15)
 - [ ] AI 채점이 실패했을 때 처리 (문장은 저장됐는데 채점만 실패한 경우)
 - [ ] 친구 수 상한을 둘지
-- [ ] 짝꿍(콩이·치즈·먹물이·식빵이)이 화면 모드를 어떻게 정하는지 → 시안 수정 대기 중
+- [x] 짝꿍이 화면 모드를 정하는지 → **아니요. 화면은 하나, 말투만 다름** (D-16)
+- [ ] 짝꿍 말투를 **어디서 처리할지** — 프론트에 4종 문구를 넣을지, 서버가 말투에 맞춰 내려줄지
+      (AI 교정 설명은 서버, 버튼·인사말 같은 고정 문구는 프론트가 자연스러워요)

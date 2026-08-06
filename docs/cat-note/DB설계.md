@@ -52,7 +52,7 @@ erDiagram
 | `id` | BIGINT PK | 자동 번호 |
 | `user_id` | BIGINT FK → 기존 `users.id` | 두통 기록에서 쓰는 구글 사용자 테이블과 연결 |
 | `note_id` | VARCHAR(15) UNIQUE | 수첩 아이디. 영문+숫자 4~15자, **소문자로 변환해 저장** (D-10) |
-| `partner` | ENUM('kongi','cheese','meokmul','sikppang') | **짝꿍** — 콩이/치즈/먹물이/식빵이. 말투와 난이도를 정함. **한 번 정하면 못 바꿈** (D-09, D-13) |
+| `partner` | ENUM('kongi','cheese','meokmul','sikppang') | **짝꿍** — 콩이/치즈/먹물이/식빵이. **말투만** 정함 (화면은 모두 동일). 언제든 변경 가능 (D-16, D-17) |
 | `nickname` | VARCHAR(20) | 별명 (8자 제한은 화면에서) |
 | `bio` | VARCHAR(100) NULL | 나를 소개하는 한 문장 |
 | `avatar` | ENUM('cat','dog','rabbit','dino') | 동반 동물 |
@@ -62,7 +62,7 @@ erDiagram
 | `daily_reminder` | BOOLEAN | 매일 알림 켜기 (기본 false) |
 | `created_at` | DATETIME | 만든 시각 |
 
-> 💡 **`role` 칸이 사라졌어요.** 아이/어른 2택이 짝꿍 4명 선택으로 바뀌면서(D-13), `partner` 하나로 말투·난이도·화면 모드를 다 판단해요.
+> 💡 **`role` 칸이 사라졌어요.** 화면이 하나로 통합되면서(D-16) 화면 모드를 구분할 필요가 없어졌고, `partner`는 **말투를 고르는 값**으로만 써요.
 
 > 💡 **왜 기존 `users`와 나눴나요?** 두통 기록만 쓰는 사람도 있으니까요. 고양이 수첩에 들어온 사람만 이 테이블에 줄이 생겨요.
 
@@ -79,7 +79,7 @@ erDiagram
 | `entry_date` | DATE | 며칠 것인지 |
 | `is_complete` | BOOLEAN | 5문장 다 썼는지 |
 | `completed_at` | DATETIME NULL | 완성한 시각 |
-| `accuracy` | TINYINT NULL | 정확도 % — **교정 없는 문장 수 ÷ 5 × 100** (D-11, 어른 모드) |
+| `accuracy` | TINYINT NULL | 정확도 % — **교정 없는 문장 수 ÷ 5 × 100** (D-11). 화면 통합으로 **모든 사용자에게 표시** (D-16) |
 | `created_at` | DATETIME | |
 
 **UNIQUE (cat_user_id, entry_date)** — 한 사람이 같은 날짜에 수첩을 두 개 만들 수 없게!
@@ -226,4 +226,4 @@ erDiagram
 - [ ] 기존 `headache_log` DB에 테이블을 추가할지, `cat_note` DB를 새로 만들지
 - [x] 하루가 바뀌는 기준 시각 → **밤 12시(자정)**, `entry_date`는 한국 시간 기준 날짜 (D-15)
 - [ ] 친구 수 제한을 둘지 (두면 `friendships`에 개수 검사 필요)
-- [ ] 짝꿍이 화면 모드를 어떻게 정하는지 → 시안 수정 대기 중
+- [x] 짝꿍이 화면 모드를 정하는지 → **아니요. 화면은 하나, 말투만 다름** (D-16)

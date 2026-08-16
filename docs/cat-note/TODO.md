@@ -17,6 +17,9 @@
 ## 🤔 아직 정할 것 (코딩하면서 정해도 되는 것들)
 - [ ] 수첩 아이디 금지어 목록
 - [ ] 기존 `headache_log` DB에 테이블 추가 vs `cat_note` DB 새로 만들기
+      ⚠️ **지금 로컬과 운영이 서로 달라요 — 통일 필요**
+      · 로컬(도커): `cat_note` DB에 8개 생성
+      · 운영(TiDB): `headache_log` DB에 8개 생성됨 (`.env`가 그쪽을 가리켜서)
 - [ ] **발음 듣기(TTS)** — 브라우저 내장 vs 외부 API
 - [ ] **번역** — 맞춤법 AI API로 같이? 번역 전용 API?
 - [ ] **어른 모드 탭 구성** — 어린이와 다르게 갈지
@@ -88,14 +91,20 @@
 
 ## 0단계. 프로젝트 준비
 - [x] 코드 위치 정하기 — `frontend/src/app/cat-note/` (기존 사이트 안, 새 저장소 안 만듦)
-- [ ] 백엔드에 고양이 수첩 API 폴더 만들기 (기존 FastAPI 안에)
-- [ ] MySQL에 고양이 수첩 테이블 추가 (기존 `headache_log` DB 사용 여부 정하기)
+- [ ] 백엔드에 고양이 수첩 API 폴더 만들기 (기존 FastAPI 안에) ← **다음 할 일**
+- [x] MySQL에 고양이 수첩 테이블 추가 — 로컬 도커 MySQL에 8개 생성 확인
+- [x] **로컬 개발 환경 도커화** → `docker-compose.dev.yml` (커밋 `f244657`)
+      백엔드(3.11) + MySQL 컨테이너. 실행: `docker compose -f docker-compose.dev.yml up -d`
+      ⚠️ `backend/.env`는 **운영 TiDB**를 가리켜요. 로컬은 반드시 `.env.docker`(=도커 구성)를 쓸 것
 - [ ] 디자인 HTML 파일을 `docs/cat-note/design/` 에 저장해두기 (참고용)
 
 ## 1단계. 데이터베이스 설계
 - [x] **설계 문서 작성** → [DB설계.md](DB설계.md) (테이블 8개 + ERD)
 - [ ] ERD 그림으로 확인 (dbdiagram.io 등)
-- [ ] 실제 테이블 만들기 (SQL 또는 SQLAlchemy 모델)
+- [x] **실제 테이블 만들기** — `backend/app/models.py`에 SQLAlchemy 모델 8개 (커밋 `e7876fc`)
+      `CatUser` / `CatEntry` / `CatSentence` / `CatCorrection` /
+      `CatFriendship` / `CatPraise` / `CatComment` / `CatVocabItem`
+      서버 켜지면 `create_all`이 자동으로 테이블을 만들어요 (로컬 확인 완료 ✅)
 
 ## 2단계. 첫 진입 & 계정 (구글 로그인 사용)
 - [ ] 로그인 안 했으면 사이트 로그인으로 보내기 (기존 방식 그대로)

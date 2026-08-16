@@ -38,6 +38,17 @@ erDiagram
     entries ||--o{ comments : "댓글을 받는다"
 ```
 
+### 실제 DB에서 뽑은 ERD (v1)
+
+위 mermaid가 **설계 의도**라면, 아래는 **구현 결과**예요.
+로컬 개발 DB(도커 MySQL)에 실제로 만들어진 테이블을 DBeaver로 뽑았어요.
+
+![고양이 수첩 ERD v1](design/ERD-v1.png)
+
+> 아래쪽에 떨어져 있는 `headache_entries` / `favorite_medications`는
+> **두통 기록 앱 테이블**이에요. 같은 DB에 함께 있어서 그림에 나오지만
+> 고양이 수첩과는 관계가 없어요.
+
 ---
 
 ## 2. 테이블 상세

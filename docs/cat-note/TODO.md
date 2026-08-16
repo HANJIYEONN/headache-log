@@ -74,7 +74,7 @@
 ## 📐 설계 & 🎨 디자인 준비 (코딩 전 단계)
 - [ ] **화면 흐름도 & URL 구조** — 화면 이동 순서 그리기, 페이지 주소 정하기 (/login, /home, /write ...)
 - [x] **API 명세서** → [API명세서.md](API명세서.md) (엔드포인트 25개 + 화면↔API 연결표)
-- [ ] **DB ERD 그리기** — 테이블 관계를 그림으로 (dbdiagram.io 추천), design/ 폴더에 저장
+- [x] **DB ERD 그리기** → [design/ERD-v1.png](design/ERD-v1.png) (DBeaver로 실제 DB에서 추출)
 - [ ] **폴더 구조 정하기** — frontend/backend 코드를 어떻게 나눠 담을지, README에 기록
 - [ ] **인증 흐름 정리** — JWT vs 세션, 토큰 저장 위치, 비로그인 접근 막기
 - [ ] **배포 계획** — 프론트(Vercel?), 백엔드+DB(Render? Railway?), 두통 프로젝트 경험 참고
@@ -100,7 +100,8 @@
 
 ## 1단계. 데이터베이스 설계
 - [x] **설계 문서 작성** → [DB설계.md](DB설계.md) (테이블 8개 + ERD)
-- [ ] ERD 그림으로 확인 (dbdiagram.io 등)
+- [x] **ERD 그림으로 확인** → [design/ERD-v1.png](design/ERD-v1.png)
+      DBeaver로 **실제 DB에서** 뽑았어요 (dbdiagram.io보다 정확해요)
 - [x] **실제 테이블 만들기** — `backend/app/models.py`에 SQLAlchemy 모델 8개 (커밋 `e7876fc`)
       `CatUser` / `CatEntry` / `CatSentence` / `CatCorrection` /
       `CatFriendship` / `CatPraise` / `CatComment` / `CatVocabItem`

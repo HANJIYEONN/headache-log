@@ -114,7 +114,9 @@ Authorization: Bearer <access_token>
 **응답 201** — 1-1과 같은 모양
 **응답 409** — `{ "detail": "이미 있는 아이디예요" }`
 
-> ⚠️ `partner`는 여기서 딱 한 번만 정해요. 나중에 못 바꿔요 (D-09, D-13).
+> `partner`는 여기서 처음 정하지만, **나중에 `PATCH /me`로 바꿀 수 있어요 (D-17).**
+> 짝꿍은 말투만 정하기 때문에 바꿔도 데이터·친구 관계에 영향이 없어요.
+> (D-09의 "변경 불가"는 화면이 통합되면서 D-17로 수정됐어요)
 
 ### 1-4. 내 정보 수정 — `PATCH /me`
 
@@ -288,9 +290,15 @@ Authorization: Bearer <access_token>
 ### 4-3. 친구 신청 — `POST /friends`
 요청: `{ "note_id": "minjun22" }` → 응답 201
 **409** — 이미 친구이거나 신청함
+**409** — `{ "detail": "친구는 10명까지 사귈 수 있어요" }` (친구 수 상한, D-22)
 
 ### 4-4. 수락 — `POST /friends/{friendship_id}/accept`
+**409** — 상한 초과 시 거절. 수락 시점엔 **신청한 사람·받은 사람 양쪽 다** 검사해요 (D-22)
+
 ### 4-5. 거절·삭제 — `DELETE /friends/{friendship_id}`
+
+> 📌 **친구 수 상한 = 10명** (D-22). 세는 기준은 `status='accepted'`이고,
+> 내가 신청한 것(`requester_id`)과 받은 것(`receiver_id`)을 **합쳐서** 세요.
 
 ### 4-6. 친구 피드 — `GET /friends/feed`
 

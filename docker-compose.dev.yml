@@ -3,7 +3,8 @@ services:
     image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: devpassword
-      MYSQL_DATABASE: cat_note
+      # 사이트 전체(두통 기록 + 고양이 수첩)를 한 DB에 담아요 — 결정 D-21
+      MYSQL_DATABASE: world_holicat
     ports:
       - "127.0.0.1:3307:3306"
     volumes:

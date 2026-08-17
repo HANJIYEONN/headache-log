@@ -352,7 +352,7 @@ Authorization: Bearer <access_token>
 
 | 주소 | 하는 일 | 언제 |
 |---|---|---|
-| `POST /translate` | 번역 보기 (LEARN-07) | 방식 미정 |
+| ~~`POST /translate`~~ | 번역 보기 (LEARN-07) | **별도 API 안 만듦 (D-20)** — 채점 응답(`POST /entries/today/complete`)에 번역을 함께 담아요 |
 | `GET /corrections/similar` | 비슷한 실수 3개 (LEARN-04) | 나중에 |
 
 ---

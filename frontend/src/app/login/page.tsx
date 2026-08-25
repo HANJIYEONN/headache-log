@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import CatIcon from '@/components/CatIcon';
 import CatSittingIcon from '@/components/CatSittingIcon';
-import GoogleGIcon from '@/components/GoogleGIcon';
 import { playMeow } from '@/lib/meow';
 import { PageTitle, useT } from '@/i18n/LanguageProvider';
 
@@ -90,25 +89,24 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500">{t.login.subtitle}</p>
         </div>
 
-        {/* 구글 로그인 버튼 — 기본 버튼이 못생겨서, 예쁜 버튼을 위에 그리고
-            "진짜 구글 버튼"은 투명하게 만들어 그 위에 그대로 겹쳐놨어요.
-            눈에는 우리 버튼이 보이지만, 클릭은 진짜 구글 버튼이 받아서 처리해요. */}
-        <div className="relative mx-auto" style={{ width: BUTTON_WIDTH }}>
-          <button
-            type="button"
-            tabIndex={-1}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#f8ccdd] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#ffe4ee]"
-          >
-            <GoogleGIcon />
-            {t.login.googleButton}
-          </button>
-          <div className="absolute inset-0 overflow-hidden rounded-xl opacity-0">
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={() => setError(t.login.errGoogle)}
-              width={BUTTON_WIDTH}
-            />
-          </div>
+        {/* 구글 로그인 버튼
+            ⚠️ 예전엔 예쁜 커스텀 버튼을 그리고 "진짜 구글 버튼"을 투명하게(opacity-0)
+            그 위에 겹쳐뒀어요. 그런데 구글이 클릭재킹(속임수 클릭) 방지를 강화하면서
+            가려지거나 투명한 버튼은 눌러도 반응하지 않게 됐어요.
+            버튼은 보이는데 눌러도 아무 일이 없고 에러조차 안 남는 상태가 됐죠.
+
+            그래서 구글이 주는 버튼을 그대로 써요. 글자는
+            "Google 계정으로 로그인" 처럼 브라우저 언어에 맞게 나와요. */}
+        <div className="mx-auto flex justify-center" style={{ width: BUTTON_WIDTH }}>
+          <GoogleLogin
+            onSuccess={handleSuccess}
+            onError={() => setError(t.login.errGoogle)}
+            width={BUTTON_WIDTH}
+            theme="outline"
+            size="large"
+            shape="rectangular"
+            text="signin_with"
+          />
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

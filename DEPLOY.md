@@ -50,7 +50,7 @@ flowchart LR
 
 - [ ] Docker, Docker Compose, nginx 설치
 - [ ] 이 저장소를 서버로 clone
-- [ ] `backend/.env` 에 실제 값 채우기:
+- [ ] 백엔드 저장소(`world-holicat-backend`)의 `.env` 에 실제 값 채우기:
       - `DATABASE_URL` = TiDB Cloud 연결 문자열 (TiDB 콘솔 → Connect, mysql+pymysql 형식 + SSL 옵션)
       - `GOOGLE_CLIENT_ID`, `JWT_SECRET`, `FRONTEND_URL`
 - [ ] `docker compose up -d --build` 로 백엔드 실행 (DB는 TiDB Cloud라 컨테이너 없음)

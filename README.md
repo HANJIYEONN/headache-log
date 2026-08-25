@@ -13,7 +13,7 @@
 
 ## 스택
 - **Frontend**: Next.js 16 (React 19, TypeScript, Tailwind) — `frontend/`
-- **Backend**: FastAPI (Python) — `backend/`
+- **Backend**: FastAPI (Python) — 별도 저장소 [world-holicat-backend](https://github.com/HANJIYEONN/world-holicat-backend)
 - **DB**: MySQL (로컬) / TiDB Cloud (배포)
 - **Auth**: Google 로그인 전용
 
@@ -47,17 +47,19 @@ frontend/src/i18n/
 # frontend
 cd frontend && npm run dev        # http://localhost:3000
 
-# backend
-cd backend && source .venv/bin/activate
-uvicorn app.main:app --reload     # http://localhost:8000
+# backend (별도 저장소에서, 도커로 실행)
+cd ../world-holicat-backend
+docker compose -f docker-compose.dev.yml up -d   # http://localhost:8000
 ```
 
 ## 저장소 구성
 
-이 저장소가 원본(모노레포)이고, 배포용으로 나눠둔 저장소가 따로 있어요.
+프론트엔드와 문서는 이 저장소(모노레포)에 있고, **백엔드는 별도 저장소가 원본**이에요.
+2026-08-23에 백엔드를 이 저장소에서 빼내 `world-holicat-backend` 하나로 합쳤어요
+(두 곳에 흩어져 있다가 한 달 넘게 서로 어긋났던 문제를 정리한 거예요).
 
 - [world-holicat-frontend](https://github.com/HANJIYEONN/world-holicat-frontend) — Vercel이 여기서 배포
-- [world-holicat-backend](https://github.com/HANJIYEONN/world-holicat-backend) — GitHub Actions로 서버 배포
+- [world-holicat-backend](https://github.com/HANJIYEONN/world-holicat-backend) — **백엔드 원본**. 여기서 작업하고, GitHub Actions로 서버 배포
 
 ## 문서
 

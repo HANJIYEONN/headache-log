@@ -24,7 +24,7 @@
 
 > 🚚 **남은 운영 작업 1개** — 운영 DB(TiDB)는 아직 `headache_log`예요.
 > 고양이 수첩 배포할 때 `world_holicat`으로 이관해야 해요.
-> 절차: 운영 덤프 → 새 DB 생성 → 복원 → `backend/.env`의 `DATABASE_URL` 교체
+> 절차: 운영 덤프 → 새 DB 생성 → 복원 → 백엔드 저장소 `.env`의 `DATABASE_URL` 교체
 > (로컬 도커는 2026-08-17에 `world_holicat`으로 교체 완료 ✅)
 
 ---
@@ -100,16 +100,19 @@
 - [x] 코드 위치 정하기 — `frontend/src/app/cat-note/` (기존 사이트 안, 새 저장소 안 만듦)
 - [ ] 백엔드에 고양이 수첩 API 폴더 만들기 (기존 FastAPI 안에) ← **다음 할 일**
 - [x] MySQL에 고양이 수첩 테이블 추가 — 로컬 도커 MySQL에 8개 생성 확인
-- [x] **로컬 개발 환경 도커화** → `docker-compose.dev.yml` (커밋 `f244657`)
-      백엔드(3.11) + MySQL 컨테이너. 실행: `docker compose -f docker-compose.dev.yml up -d`
-      ⚠️ `backend/.env`는 **운영 TiDB**를 가리켜요. 로컬은 반드시 `.env.docker`(=도커 구성)를 쓸 것
+- [x] **로컬 개발 환경 도커화** → 백엔드 저장소의 `docker-compose.dev.yml`
+      백엔드(3.11) + MySQL 컨테이너. 실행:
+      `cd ../world-holicat-backend && docker compose -f docker-compose.dev.yml up -d`
+- [x] **백엔드 저장소 일원화** (2026-08-23) — 모노레포의 `backend/`를 없애고
+      `world-holicat-backend` 하나로 합쳤어요. 7/18 분리 이후 두 곳이 어긋나 있었거든요
+      ⚠️ 백엔드 저장소의 `.env`는 **운영 TiDB**를 가리켜요. 로컬은 반드시 `.env.docker`를 쓸 것
 - [ ] 디자인 HTML 파일을 `docs/cat-note/design/` 에 저장해두기 (참고용)
 
 ## 1단계. 데이터베이스 설계
 - [x] **설계 문서 작성** → [DB설계.md](DB설계.md) (테이블 8개 + ERD)
 - [x] **ERD 그림으로 확인** → [design/ERD-v1.png](design/ERD-v1.png)
       DBeaver로 **실제 DB에서** 뽑았어요 (dbdiagram.io보다 정확해요)
-- [x] **실제 테이블 만들기** — `backend/app/models.py`에 SQLAlchemy 모델 8개 (커밋 `e7876fc`)
+- [x] **실제 테이블 만들기** — 백엔드 저장소 `app/models.py`에 SQLAlchemy 모델 8개 (커밋 `e7876fc`)
       `CatUser` / `CatEntry` / `CatSentence` / `CatCorrection` /
       `CatFriendship` / `CatPraise` / `CatComment` / `CatVocabItem`
       서버 켜지면 `create_all`이 자동으로 테이블을 만들어요 (로컬 확인 완료 ✅)

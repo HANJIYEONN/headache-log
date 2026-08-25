@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import CatIcon from '@/components/CatIcon';
 import CatSittingIcon from '@/components/CatSittingIcon';
 import GoogleGIcon from '@/components/GoogleGIcon';
@@ -24,7 +24,7 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleSuccess = async (credentialResponse: any) => {
+  const handleSuccess = async (credentialResponse: CredentialResponse) => {
     const idToken = credentialResponse.credential; // 구글이 준 ID 토큰
 
     if (!idToken) {

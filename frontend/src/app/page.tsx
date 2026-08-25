@@ -8,12 +8,13 @@
 // 새 프로젝트가 생기면 아래 PROJECTS 배열에 한 줄만 추가하면 돼요!
 // ─────────────────────────────────────────────
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BrainIcon from "@/components/BrainIcon";
 import CatIcon from "@/components/CatIcon";
 import LogoutIcon from "@/components/LogoutIcon";
+import { useLoginUser } from "@/lib/useLoginUser";
 import { PageTitle, useT } from "@/i18n/LanguageProvider";
 
 // 프로필 정보 — 이름·기술 이름처럼 번역이 필요 없는 값만 여기 둬요.
@@ -63,18 +64,14 @@ export default function Home() {
   };
 
   // 로그인한 사용자 이름 (확인 끝나야 화면을 보여줘요)
-  const [userName, setUserName] = useState<string | null>(null);
+  // 로그인 상태는 localStorage(리액트 바깥)에 있어서 전용 훅으로 읽어요
+  const { token, isKnown } = useLoginUser();
 
-  // 페이지 열리자마자 로그인 확인 — 안 했으면 로그인 페이지로!
+  // 로그인 안 했으면 로그인 페이지로 — 화면 상태를 바꾸는 게 아니라
+  // "페이지 이동"이라 useEffect가 맞는 자리예요
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
-    const user = localStorage.getItem("user");
-    setUserName(user ? JSON.parse(user).name : "사용자");
-  }, []);
+    if (isKnown && token === null) window.location.href = "/login";
+  }, [isKnown, token]);
 
   function handleLogout() {
     localStorage.removeItem("access_token");
@@ -82,8 +79,8 @@ export default function Home() {
     window.location.href = "/login";
   }
 
-  // 로그인 확인 전엔 아무것도 안 보여줘요 (화면 깜빡임 방지)
-  if (userName === null) return null;
+  // 로그인 확인 전/로그인 안 됨 → 아무것도 안 보여줘요 (화면 깜빡임 방지)
+  if (!isKnown || token === null) return null;
 
   return (
     <main className="relative mx-auto w-full max-w-md px-5 py-10">

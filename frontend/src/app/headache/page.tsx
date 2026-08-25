@@ -13,6 +13,7 @@ import LogoutIcon from "@/components/LogoutIcon";
 import EntryTable from "@/components/EntryTable";
 import EntryCalendar from "@/components/EntryCalendar";
 import EntryCharts from "@/components/EntryCharts";
+import { useLoginUser } from "@/lib/useLoginUser";
 import {
   fetchEntries,
   deleteEntry,
@@ -40,23 +41,20 @@ export default function Home() {
   // 수정 중인 기록 (null이면 새 기록 모드)
   const [editing, setEditing] = useState<Entry | null>(null);
   // 로그인한 사용자 이름 (로그인 확인이 끝나야 화면을 보여줘요)
-  const [userName, setUserName] = useState<string | null>(null);
   // 즐겨찾기(자주 복용하는 약, 최대 3개)
   const [favorites, setFavorites] = useState<FavoriteMedication[]>([]);
   const [quickAddMessage, setQuickAddMessage] = useState("");
   // 수정 중인 즐겨찾기 (null이면 아님)
   const [editingFavorite, setEditingFavorite] = useState<FavoriteMedication | null>(null);
 
-  // 페이지 열리자마자 로그인했는지 검사 — 안 했으면 로그인 페이지로!
+  // 로그인 상태는 localStorage(리액트 바깥)에 있어서 전용 훅으로 읽어요
+  const { token, isKnown, name } = useLoginUser();
+  const userName = name ?? "";
+
+  // 로그인 안 했으면 로그인 페이지로 — 화면 상태 변경이 아니라 페이지 이동
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
-    const user = localStorage.getItem("user");
-    setUserName(user ? JSON.parse(user).name : "");
-  }, []);
+    if (isKnown && token === null) window.location.href = "/login";
+  }, [isKnown, token]);
 
   // 로그아웃: 저장한 토큰을 지우고 로그인 페이지로
   function handleLogout() {
@@ -83,11 +81,23 @@ export default function Home() {
     }
   }, []);
 
-  // useEffect : "페이지가 처음 열렸을 때 한 번 실행해줘"
+  // 페이지가 처음 열렸을 때 목록을 한 번 불러와요.
+  // cancelled 표시는 "응답이 늦게 왔는데 화면을 이미 떠난" 경우를 막아줘요.
   useEffect(() => {
-    load();
-    loadFavorites();
-  }, [load, loadFavorites]);
+    let cancelled = false;
+    (async () => {
+      const [loadedEntries, loadedFavorites] = await Promise.all([
+        fetchEntries().catch(() => []),
+        fetchFavorites().catch(() => []),
+      ]);
+      if (cancelled) return;
+      setEntries(loadedEntries);
+      setFavorites(loadedFavorites);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // 즐겨찾기 버튼 클릭: 저장해둔 내용 그대로 오늘 기록으로 완성해서 저장
   async function handleQuickAdd(favorite: FavoriteMedication) {

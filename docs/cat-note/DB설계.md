@@ -5,7 +5,8 @@
 | 버전 | v0.1 (초안) |
 | 작성일 | 2026-08-02 |
 | 기준 | 요구사항 정의서 v0.3, 결정 D-01~D-11 |
-| DB | MySQL (로컬) / TiDB Cloud (배포) — 두통 기록과 같은 서버 |
+| DB | MySQL (로컬 도커) / TiDB Cloud (배포) — 두통 기록과 같은 서버 |
+| DB 이름 | **`world_holicat`** — 사이트 공용 DB 하나에 두 앱을 함께 담아요 (D-21)<br>※ 운영은 아직 `headache_log`, 배포 시 이관 예정 |
 
 ---
 
@@ -38,6 +39,17 @@ erDiagram
     entries ||--o{ comments : "댓글을 받는다"
 ```
 
+### 실제 DB에서 뽑은 ERD (v1)
+
+위 mermaid가 **설계 의도**라면, 아래는 **구현 결과**예요.
+로컬 개발 DB(도커 MySQL)에 실제로 만들어진 테이블을 DBeaver로 뽑았어요.
+
+![고양이 수첩 ERD v1](design/ERD-v1.png)
+
+> 아래쪽에 떨어져 있는 `headache_entries` / `favorite_medications`는
+> **두통 기록 앱 테이블**이에요. 같은 DB에 함께 있어서 그림에 나오지만
+> 고양이 수첩과는 관계가 없어요.
+
 ---
 
 ## 2. 테이블 상세
@@ -50,7 +62,7 @@ erDiagram
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | `id` | BIGINT PK | 자동 번호 |
-| `user_id` | BIGINT FK → 기존 `users.id` | 두통 기록에서 쓰는 구글 사용자 테이블과 연결 |
+| `user_email` | VARCHAR(255) UNIQUE | 구글 로그인 이메일. **기존 백엔드가 사용자를 이 값으로 구분해요** (users 테이블이 따로 없음) |
 | `note_id` | VARCHAR(15) UNIQUE | 수첩 아이디. 영문+숫자 4~15자, **소문자로 변환해 저장** (D-10) |
 | `partner` | ENUM('kongi','cheese','meokmul','sikppang') | **짝꿍** — 콩이/치즈/먹물이/식빵이. **말투만** 정함 (화면은 모두 동일). 언제든 변경 가능 (D-16, D-17) |
 | `nickname` | VARCHAR(20) | 별명 (8자 제한은 화면에서) |
@@ -64,7 +76,9 @@ erDiagram
 
 > 💡 **`role` 칸이 사라졌어요.** 화면이 하나로 통합되면서(D-16) 화면 모드를 구분할 필요가 없어졌고, `partner`는 **말투를 고르는 값**으로만 써요.
 
-> 💡 **왜 기존 `users`와 나눴나요?** 두통 기록만 쓰는 사람도 있으니까요. 고양이 수첩에 들어온 사람만 이 테이블에 줄이 생겨요.
+> 💡 **왜 따로 만드나요?** 두통 기록만 쓰는 사람도 있으니까요. 고양이 수첩에 들어온 사람만 이 테이블에 줄이 생겨요.
+>
+> 📌 **기존 백엔드에는 `users` 테이블이 없어요.** 구글 로그인에서 꺼낸 이메일(`user_email`)로 사용자를 구분해요 (`get_current_user_email`). 고양이 수첩도 같은 방식을 따라가요.
 
 ---
 
@@ -75,7 +89,7 @@ erDiagram
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | `id` | BIGINT PK | |
-| `cat_user_id` | BIGINT FK → cat_users | 누구의 수첩인지 |
+| `cat_user_id` | BIGINT FK → cat_users.id | 누구의 수첩인지 |
 | `entry_date` | DATE | 며칠 것인지 |
 | `is_complete` | BOOLEAN | 5문장 다 썼는지 |
 | `completed_at` | DATETIME NULL | 완성한 시각 |
@@ -168,7 +182,7 @@ erDiagram
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | `id` | BIGINT PK | |
-| `cat_user_id` | BIGINT FK → cat_users | |
+| `cat_user_id` | BIGINT FK → cat_users.id | |
 | `correction_id` | BIGINT FK → corrections NULL | 어느 교정에서 저장했는지 |
 | `expression` | VARCHAR(100) | 배운 표현 ("좋아요") |
 | `meaning` | VARCHAR(200) NULL | 뜻·설명 |
@@ -223,7 +237,9 @@ erDiagram
 
 ## 5. 아직 정할 것
 
-- [ ] 기존 `headache_log` DB에 테이블을 추가할지, `cat_note` DB를 새로 만들지
+- [x] DB를 어디에 둘지 → **사이트 공용 DB 하나, 이름은 `world_holicat`** (D-21)
 - [x] 하루가 바뀌는 기준 시각 → **밤 12시(자정)**, `entry_date`는 한국 시간 기준 날짜 (D-15)
-- [ ] 친구 수 제한을 둘지 (두면 `friendships`에 개수 검사 필요)
+- [x] 친구 수 제한 → **최대 10명** (D-22)
+      `friendships`에서 `status='accepted'` 개수를 세요 (내가 requester든 receiver든 둘 다 포함).
+      **신청할 때와 수락할 때 양쪽 모두** 검사해야 해요 — 수락 시점엔 두 사람 다 확인!
 - [x] 짝꿍이 화면 모드를 정하는지 → **아니요. 화면은 하나, 말투만 다름** (D-16)

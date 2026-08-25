@@ -31,14 +31,8 @@ workSpace/
 │       │   └── EntryForm.tsx  # 기록 입력 폼
 │       └── lib/
 │           └── api.ts         # 백엔드 호출 함수 모음
-├── backend/                   # FastAPI (Python)
-│   └── app/
-│       ├── main.py            # 서버 시작점 (CORS, 라우터 등록)
-│       ├── database.py        # DB 연결 설정
-│       ├── models.py          # DB 테이블 정의 (SQLAlchemy)
-│       ├── schemas.py         # 요청/응답 데이터 모양 (Pydantic)
-│       └── routers/
-│           └── entries.py     # /entries API (CRUD)
+│                              # ⚠️ 백엔드는 이 저장소에 없어요 (2026-08-23 분리)
+│                              #    → world-holicat-backend 저장소의 app/ 참고
 ├── README.md                  # 프로젝트 소개
 ├── TODO.md                    # 작업 진행 상황
 └── DESIGN.md                  # 이 문서!
@@ -132,7 +126,7 @@ sequenceDiagram
 ```
 
 - 준비물: Google Cloud Console에서 **OAuth 클라이언트 ID** 발급 (누나가 하면 제가 안내할게요!)
-- 발급받은 값은 `backend/.env`에 저장 (git에 올라가지 않아요 — 비밀이니까! 🤫)
+- 발급받은 값은 백엔드 저장소의 `.env`에 저장 (git에 올라가지 않아요 — 비밀이니까! 🤫)
 
 ## 7. 정해진 규칙들
 

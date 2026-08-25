@@ -1,5 +1,6 @@
 // "냐옹" 소리 WAV 파일을 직접 생성하는 스크립트 (외부 음원 다운로드 없음)
-const fs = require("fs");
+// 실행: node scripts/gen-meow.mjs   (.mjs = ESM 방식이라는 표시)
+import fs from "node:fs";
 
 const FS = 22050;        // 샘플레이트
 const DUR = 0.45;        // 길이(초)

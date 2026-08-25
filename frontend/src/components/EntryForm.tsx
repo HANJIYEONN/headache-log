@@ -7,7 +7,7 @@
 // 컴포넌트 = 화면 조각을 만드는 함수 (레고 블록 같은 것 🧱)
 // ─────────────────────────────────────────────
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   createEntry,
   updateEntry,
@@ -70,8 +70,16 @@ export default function EntryForm({
   const [message, setMessage] = useState("");  // 안내 문구
   const [recordBp, setRecordBp] = useState(false); // 혈압도 기록할지 여부
 
-  // 수정할 기록이 정해지면 그 값들을 폼에 채워넣어요
-  useEffect(() => {
+  // ── 부모가 "이걸 수정해줘"라고 새로 알려주면 폼을 그 값으로 채워요 ──
+  //
+  // useEffect가 아니라 렌더 중에 "이전 값과 달라졌나?"를 비교해요.
+  // 이게 리액트가 권하는 방식이에요 — 화면을 두 번 그리지 않아서
+  // 빈 폼이 잠깐 보였다가 채워지는 깜빡임이 없어요.
+  // (undefined로 시작해서 첫 렌더에도 한 번 맞춰줘요)
+
+  const [prevEditing, setPrevEditing] = useState<Entry | null | undefined>(undefined);
+  if (editing !== prevEditing) {
+    setPrevEditing(editing);
     if (editing) {
       const { id: _id, ...rest } = editing; // id는 폼에 필요 없으니 빼고
       setForm(rest);
@@ -81,10 +89,13 @@ export default function EntryForm({
       setForm(emptyForm());
       setRecordBp(false);
     }
-  }, [editing]);
+  }
 
-  // 수정할 즐겨찾기가 정해지면 그 내용을 폼에 채워넣어요
-  useEffect(() => {
+  const [prevFavorite, setPrevFavorite] = useState<
+    FavoriteMedication | null | undefined
+  >(undefined);
+  if (editingFavorite !== prevFavorite) {
+    setPrevFavorite(editingFavorite);
     if (editingFavorite) {
       setForm({
         ...emptyForm(), // 날짜는 오늘로
@@ -100,7 +111,7 @@ export default function EntryForm({
       setRecordBp(editingFavorite.bp_systolic !== null);
       setMessage("");
     }
-  }, [editingFavorite]);
+  }
 
   // form에서 한 칸만 바꾸는 도우미 함수
   // 예: update("dose_count", 2) → 복용횟수만 2로 변경

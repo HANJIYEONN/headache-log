@@ -73,7 +73,7 @@ erDiagram
 | `avatar` | ENUM('cat','dog','rabbit','dino') | 동반 동물 |
 | `learning_language` | CHAR(2) | 배우는 언어 (ko/en/ja/zh) |
 | `feedback_language` | CHAR(2) NULL | 교정 설명·번역을 받을 언어 |
-| `writing_stage` | TINYINT | 내 단계 (1,2,3…) — **어린이·어른 공통** (D-14). ⚠️ `GET /stats`는 단계를 저장값이 아니라 단어장 개수로 **그때그때 계산**해요(D-23). 두 값이 어긋날 수 있어서, 단어장(5장)을 만들 때 이 컬럼을 지울지 정해야 해요 |
+| `writing_stage` | TINYINT | 내 단계 (1,2,3…) — **어린이·어른 공통** (D-14). ⚠️ **이 컬럼은 이제 안 읽어요.** `GET /me`·`GET /stats` 둘 다 단계를 단어장 개수로 그때그때 계산해요(D-23). NOT NULL 이라 지우려면 마이그레이션이 필요해서, DB를 `world_holicat`으로 옮길 때 같이 정리하면 돼요 |
 | `daily_reminder` | BOOLEAN | 매일 알림 켜기 (기본 false) |
 | `created_at` | DATETIME | 만든 시각 |
 

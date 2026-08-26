@@ -97,6 +97,16 @@ Authorization: Bearer <access_token>
 | `too_short` / `too_long` | 4자 미만 / 15자 초과 |
 | `invalid_char` | 영문·숫자 말고 다른 글자가 있음 |
 
+> **`reason`은 하나만 돌려줘요** — 여러 개가 겹치면 **제일 도움 되는 것**을 골라요.
+> 순서: 빈 값 → `too_short` / 그 외엔 `invalid_char` → `too_short` → `too_long` → `duplicate`
+>
+> 예를 들어 `"지우"`는 짧기도 하고 한글이기도 한데,
+> *"영어와 숫자만 쓸 수 있어요"* 가 더 쓸모 있는 안내라 그걸 먼저 봐요.
+
+> **추천 아이디(`suggestions`)는 실제로 쓸 수 있는 것만** 최대 3개 줘요.
+> 끝의 숫자를 떼어낸 뒤(`jiwoo07` → `jiwoo`) 다른 걸 붙여봐요.
+> 예: `jiwoo07`이 이미 있으면 → `jiwoo1`, `jiwoo7`, `jiwoo22`
+
 ### 1-3. 계정 만들기 — `POST /me`
 
 모드 선택 + 수첩 아이디를 다 정하고 **"수첩 만들기"** 누를 때.

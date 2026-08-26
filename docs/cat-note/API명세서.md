@@ -244,9 +244,34 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 3-2. 특정 날짜 상세 — `GET /entries/{date}`
+**응답 422** — `year`·`month`가 없거나 범위 밖일 때 (year 2000~2100, month 1~12)
 
-예: `/entries/2026-07-20`. 응답은 2-3과 같은 모양 (교정 포함).
+> 다 쓰지 못한 날도 `days`에 나와요 (`is_complete: false`, `accuracy: null`).
+> 달력에 "쓰다 만 날"을 표시할 수 있게요. `total_stamps_this_month`는 **다 쓴 날만** 셉니다.
+
+### 3-2. 특정 날짜 상세 — `GET /entries/{entry_date}`
+
+예: `/entries/2026-07-20`. 응답은 2-3과 같은 모양(교정·번역 포함)에서
+`streak_days`·`total_stamps`를 빼고 `entry_date`를 더한 형태예요.
+그 둘은 **"지금" 값**이라 지난 날짜에 붙이면 헷갈리거든요.
+
+**응답 200**
+```json
+{
+  "entry_id": 12,
+  "entry_date": "2026-07-20",
+  "is_complete": true,
+  "accuracy": 80,
+  "sentences": [ "...2-3과 같은 모양..." ],
+  "new_expressions": ["좋아요"]
+}
+```
+
+**응답 404** — 그날 쓴 게 없을 때 `{ "detail": "그날은 쓴 수첩이 없어요" }`
+**응답 422** — 날짜 모양이 아닐 때 (예: `/entries/어제`)
+
+> ⚠️ **주소 등록 순서가 중요해요.** `/entries/today`가 이 API보다 **먼저** 등록돼야
+> 서버가 "today"를 날짜로 읽으려다 실패하지 않아요.
 
 ### 3-3. 통계 — `GET /stats`
 
@@ -266,7 +291,26 @@ Authorization: Bearer <access_token>
 }
 ```
 
-> 어린이 모드는 `streak_days`·`total_stamps`만, 어른 모드는 정확도·레벨까지 써요.
+> ~~어린이 모드는 `streak_days`·`total_stamps`만, 어른 모드는 정확도·레벨까지~~
+> → **D-16으로 화면이 하나로 합쳐져서 모두에게 같은 값을 보여줘요.**
+
+**각 값이 어떻게 나오는지**
+
+| 값 | 세는 방법 |
+|---|---|
+| `streak_days` | 오늘부터 하루씩 거슬러 세다가 빈 날을 만나면 멈춤 |
+| `total_stamps` | 다 쓴 날의 총 개수 |
+| `praises_received` | 내 수첩들이 받은 칭찬도장 수 |
+| `weekly_accuracy` | 최근 7일 중 **다 쓴 날들의 정확도 평균** (반올림) |
+| `weekly_accuracy_diff` | 이번 7일 − 그 앞 7일 |
+| `vocab_count` | 단어장에 모은 표현 수 |
+| `level` / `expressions_to_next_level` | 표현 50개마다 한 단계 (D-23) — 초급 1·2 → 중급 1·2 → 고급 1·2 |
+
+> 🈳 **쓴 날이 없으면 `weekly_accuracy`는 `0`이 아니라 `null`이에요** (D-24).
+> "정확도 0%"는 못했다는 뜻으로 읽히는데 실제로는 아직 안 쓴 것뿐이거든요.
+> 지난주 기록이 없으면 `weekly_accuracy_diff`도 `null`이에요.
+
+> 📌 `vocab_count`는 단어장(5장) API를 만들기 전까지는 계속 0이라, 단계도 "초급 1"에 머물러요.
 
 ---
 
@@ -386,7 +430,7 @@ Authorization: Bearer <access_token>
 
 - [x] 하루가 바뀌는 기준 시각 → **밤 12시(자정)** 기준, 서버의 한국 시간대로 판정 (D-15)
 - [ ] AI 채점이 실패했을 때 처리 (문장은 저장됐는데 채점만 실패한 경우)
-- [ ] 친구 수 상한을 둘지
+- [x] 친구 수 상한을 둘지 → **최대 10명** (D-22)
 - [x] 짝꿍이 화면 모드를 정하는지 → **아니요. 화면은 하나, 말투만 다름** (D-16)
 - [ ] 짝꿍 말투를 **어디서 처리할지** — 프론트에 4종 문구를 넣을지, 서버가 말투에 맞춰 내려줄지
       (AI 교정 설명은 서버, 버튼·인사말 같은 고정 문구는 프론트가 자연스러워요)

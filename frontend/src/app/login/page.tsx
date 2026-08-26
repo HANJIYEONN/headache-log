@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import CatIcon from '@/components/CatIcon';
 import CatSittingIcon from '@/components/CatSittingIcon';
+import GoogleGIcon from '@/components/GoogleGIcon';
 import { playMeow } from '@/lib/meow';
 import { PageTitle, useT } from '@/i18n/LanguageProvider';
 
@@ -23,23 +24,29 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleSuccess = async (credentialResponse: CredentialResponse) => {
-    const idToken = credentialResponse.credential; // 구글이 준 ID 토큰
+  // 구글 로그인 시작 — 우리 버튼을 누르면 이게 실행돼요.
+  // useGoogleLogin 은 구글 창을 직접 띄워주기 때문에, 버튼 모양을
+  // 우리 마음대로 만들 수 있어요 (구글이 그려주는 버튼을 안 써도 됨).
+  const startGoogleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => sendToBackend(tokenResponse.access_token),
+    onError: () => setError(t.login.errGoogle),
+  });
 
-    if (!idToken) {
+  const sendToBackend = async (googleAccessToken: string) => {
+    if (!googleAccessToken) {
       setError(t.login.errGoogle);
       return;
     }
 
     try {
-      // 백엔드 FastAPI로 ID 토큰 전송 (배포 시 NEXT_PUBLIC_API_URL로 실제 주소 사용)
+      // 백엔드 FastAPI로 구글 액세스 토큰 전송 (배포 시 NEXT_PUBLIC_API_URL 사용)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const response = await fetch(`${apiUrl}/api/v1/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token: idToken }),
+        body: JSON.stringify({ access_token: googleAccessToken }),
       });
 
       if (response.ok) {
@@ -89,25 +96,22 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500">{t.login.subtitle}</p>
         </div>
 
-        {/* 구글 로그인 버튼
-            ⚠️ 예전엔 예쁜 커스텀 버튼을 그리고 "진짜 구글 버튼"을 투명하게(opacity-0)
-            그 위에 겹쳐뒀어요. 그런데 구글이 클릭재킹(속임수 클릭) 방지를 강화하면서
-            가려지거나 투명한 버튼은 눌러도 반응하지 않게 됐어요.
-            버튼은 보이는데 눌러도 아무 일이 없고 에러조차 안 남는 상태가 됐죠.
+        {/* 구글 로그인 버튼 — 우리가 직접 그린 버튼이에요.
+            누르면 useGoogleLogin 이 구글 창을 띄워줘요.
 
-            그래서 구글이 주는 버튼을 그대로 써요. 글자는
-            "Google 계정으로 로그인" 처럼 브라우저 언어에 맞게 나와요. */}
-        <div className="mx-auto flex justify-center" style={{ width: BUTTON_WIDTH }}>
-          <GoogleLogin
-            onSuccess={handleSuccess}
-            onError={() => setError(t.login.errGoogle)}
-            width={BUTTON_WIDTH}
-            theme="outline"
-            size="large"
-            shape="rectangular"
-            text="signin_with"
-          />
-        </div>
+            ⚠️ 예전엔 "진짜 구글 버튼"을 투명하게(opacity-0) 이 버튼 위에
+            겹쳐두는 방식이었는데, 구글이 클릭재킹(속임수 클릭) 방지를
+            강화하면서 가려진 버튼은 눌러도 반응하지 않게 됐어요.
+            지금은 겹치지 않고 우리 버튼이 직접 로그인을 시작해요. */}
+        <button
+          type="button"
+          onClick={() => startGoogleLogin()}
+          className="mx-auto flex items-center justify-center gap-3 rounded-xl border border-[#f8ccdd] bg-white py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-[#ffe4ee]"
+          style={{ width: BUTTON_WIDTH }}
+        >
+          <GoogleGIcon />
+          {t.login.googleButton}
+        </button>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>

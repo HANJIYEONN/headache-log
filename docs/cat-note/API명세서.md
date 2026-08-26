@@ -144,9 +144,9 @@ Authorization: Bearer <access_token>
   "is_complete": false,
   "accuracy": null,
   "sentences": [
-    { "position": 1, "text": "오늘의 하늘은 푸르다", "input_method": "keyboard" },
-    { "position": 2, "text": "고양이가 조아요", "input_method": "keyboard" },
-    { "position": 3, "text": "아침에 우유를 마셨다", "input_method": "voice" }
+    { "position": 1, "text": "오늘의 하늘은 푸르다" },
+    { "position": 2, "text": "고양이가 조아요" },
+    { "position": 3, "text": "아침에 우유를 마셨다" }
   ]
 }
 ```
@@ -167,6 +167,9 @@ Authorization: Bearer <access_token>
 { "position": 4, "text": "학교에서 그림을 그렸다", "saved_at": "2026-08-06T21:14:00" }
 ```
 
+**응답 400** — 오늘 수첩을 이미 냈을 때 `{ "detail": "오늘 수첩은 이미 다 냈어요" }`
+**응답 422** — `position`이 1~5 밖이거나, 글이 비었거나 200자를 넘을 때 (앞뒤 공백은 저절로 잘려요)
+
 ### 2-3. 다 썼어요! (AI 채점) — `POST /entries/today/complete`
 
 **여기서만 AI를 불러요** (D-12). 5문장을 통째로 AI에게 보내서 한 번에 채점받아요.
@@ -184,12 +187,14 @@ Authorization: Bearer <access_token>
       "position": 1,
       "original_text": "오늘의 하늘은 푸르다",
       "corrected_text": null,
+      "translation": "The sky is blue today.",
       "corrections": []
     },
     {
       "position": 2,
       "original_text": "고양이가 조아요",
       "corrected_text": "고양이가 좋아요",
+      "translation": "The cat is nice.",
       "corrections": [
         {
           "wrong_text": "조아요",
@@ -207,6 +212,9 @@ Authorization: Bearer <access_token>
 ```
 
 **응답 400** — 5문장을 다 안 썼을 때 `{ "detail": "아직 다 못 썼어요 (3/5)" }`
+
+> 💸 **이미 낸 수첩에 다시 부르면 저장해둔 결과를 그대로 돌려줘요.** 다시 채점하지 않아요 — 같은 글에 AI 요금을 두 번 내게 되니까요.
+> 🌐 `translation`은 `cat_sentences.translation`에 저장해둬요. 나중에 다시 볼 때 AI를 또 부르지 않으려고요 (D-20).
 
 > ⏱️ AI 응답이 몇 초 걸릴 수 있어요. 화면에 "콩이가 읽는 중..." 같은 로딩을 꼭 보여주세요.
 

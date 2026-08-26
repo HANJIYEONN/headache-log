@@ -50,6 +50,9 @@ erDiagram
 > **두통 기록 앱 테이블**이에요. 같은 DB에 함께 있어서 그림에 나오지만
 > 고양이 수첩과는 관계가 없어요.
 
+> 📌 이 그림은 **2026-08-24 시점**이에요. 그 뒤에 `sentences.translation`이 하나 늘었으니,
+> 다음에 ERD를 다시 뽑을 때 v2로 저장하면 돼요.
+
 ---
 
 ## 2. 테이블 상세
@@ -109,6 +112,7 @@ erDiagram
 | `position` | TINYINT | 몇 번째 문장인지 (1~5) |
 | `original_text` | TEXT | 아이가 **원래 쓴 그대로** (절대 덮어쓰지 않아요) |
 | `corrected_text` | TEXT NULL | AI가 고친 문장 (교정이 없으면 NULL) |
+| `translation` | TEXT NULL | 피드백 언어로 옮긴 문장 (D-20). **2026-08-26 추가** — 채점할 때 AI가 같이 만들어줘요. 저장해두는 이유는 다시 볼 때 AI를 또 부르면 돈이 나가기 때문이에요 |
 | ~~`input_method`~~ | — | **삭제** — 음성 입력 기능이 빠지면서 글/말 구분이 필요 없어짐 (D-18) |
 | `created_at` | DATETIME | |
 

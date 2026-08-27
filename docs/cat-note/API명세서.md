@@ -65,12 +65,15 @@ Authorization: Bearer <access_token>
   "learning_language": "ko",
   "feedback_language": "ko",
   "writing_stage": 3,
-  "sentences_to_next_stage": 26,
   "daily_reminder": false
 }
 ```
 
 > `partner` 값: `kongi`(콩이·초등 이하) / `cheese`(치즈·중고등) / `meokmul`(먹물이·어른) / `sikppang`(식빵이·누구나)
+
+> ~~`sentences_to_next_stage`~~ — **뺐어요.** 단계 기준이 문장에서 **단어장 표현**으로 바뀌었어요 (D-23).
+> "다음 단계까지 몇 개"는 `GET /stats` 의 `expressions_to_next_level` 을 쓰세요.
+> `writing_stage` 도 저장값이 아니라 단어장 개수로 그때그때 계산해요 — `/stats` 의 `level` 과 늘 같아요.
 
 **응답 200** (계정 없음 → 온보딩으로)
 ```json
@@ -249,6 +252,9 @@ Authorization: Bearer <access_token>
 
 > 다 쓰지 못한 날도 `days`에 나와요 (`is_complete: false`, `accuracy: null`).
 > 달력에 "쓰다 만 날"을 표시할 수 있게요. `total_stamps_this_month`는 **다 쓴 날만** 셉니다.
+
+> 🚪 **앱을 열기만 한 날은 안 나와요.** `GET /entries/today` 가 빈 수첩을 만들어두기 때문에,
+> 그대로 두면 열어만 본 날이 "쓰다 만 날"처럼 보여요. **한 글자라도 쓴 날만** 담습니다.
 
 ### 3-2. 특정 날짜 상세 — `GET /entries/{entry_date}`
 

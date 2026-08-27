@@ -3,10 +3,8 @@
 // "프론트가 백엔드에 말 거는 전화기" 라고 생각하면 돼요 📞
 // ─────────────────────────────────────────────
 
-// 백엔드 서버 주소
-// 배포 시 Vercel에 NEXT_PUBLIC_API_URL 환경변수로 실제 서버 주소를 넣어줘요.
-// 로컬 개발 중엔 값이 없으니 localhost로 자동 대체돼요.
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// 서버 주소·로그인 명찰·401 처리는 고양이 수첩(catApi.ts)과 같이 써요.
+import { API_URL, authHeaders, checkAuth } from "./apiBase";
 
 // ── 타입(type) : "기록 한 건은 이렇게 생겼다"는 설계도 ──
 // TypeScript는 데이터 모양을 미리 정해두면
@@ -28,23 +26,6 @@ export type Entry = {
 // 새 기록을 만들 때는 아직 id가 없어요 (id는 DB가 자동으로 붙여줌)
 // Omit<Entry, "id"> = "Entry에서 id만 뺀 모양"
 export type NewEntry = Omit<Entry, "id">;
-
-// ── 로그인 토큰을 요청에 붙여주는 도우미 ──
-// 로그인하면 localStorage에 access_token이 저장돼 있어요.
-// 모든 요청에 "Authorization: Bearer 토큰" 명찰을 달아서 보내요.
-function authHeaders(): Record<string, string> {
-  const token = localStorage.getItem("access_token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
-// 401(로그인 안 됨/만료) 응답이면 로그인 페이지로 보내요
-function checkAuth(res: Response) {
-  if (res.status === 401) {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  }
-}
 
 // ── 기록 목록 가져오기 (GET) ──
 export async function fetchEntries(): Promise<Entry[]> {

@@ -221,30 +221,35 @@ export default function CatWriting({
 
       {gradeFailed && <p className="mt-3 text-xs text-[#c07777]">{write.gradeFailed}</p>}
 
-      <div className="mt-5 flex gap-2">
-        {!allWritten && (
+      {/* 버튼은 한 번에 하나만.
+          다 쓰기 전에 "다 썼어요!" 를 회색으로 띄워두면 자리만 차지하고,
+          아이는 눌러도 안 되는 버튼을 계속 보게 돼요 */}
+      <div className="mt-5">
+        {allWritten ? (
+          <button
+            type="button"
+            onClick={onDone}
+            disabled={waiting || grading}
+            className="w-full rounded-2xl px-6 py-3 text-sm font-bold transition disabled:cursor-not-allowed"
+            style={
+              waiting || grading
+                ? { backgroundColor: "#efe3c8", color: "#a08c66" }
+                : { backgroundColor: "#f5c64b", color: "#4a3a20", boxShadow: "0 3px 0 #dca92e" }
+            }
+          >
+            {grading ? write.grading(buddyName) : write.done}
+          </button>
+        ) : (
           <button
             type="button"
             onClick={goNext}
             disabled={waiting || !typed}
-            className="rounded-2xl border-2 border-[#efe3c8] bg-[#fffdf5] px-5 py-3 text-sm font-bold text-[#7a6a48] transition disabled:opacity-50"
+            className="w-full rounded-2xl px-6 py-3 text-sm font-bold transition disabled:opacity-50"
+            style={{ backgroundColor: "#f5c64b", color: "#4a3a20", boxShadow: "0 3px 0 #dca92e" }}
           >
             {write.next}
           </button>
         )}
-        <button
-          type="button"
-          onClick={onDone}
-          disabled={!allWritten || waiting || grading}
-          className="flex-1 rounded-2xl px-6 py-3 text-sm font-bold transition disabled:cursor-not-allowed"
-          style={
-            allWritten && !waiting && !grading
-              ? { backgroundColor: "#f5c64b", color: "#4a3a20", boxShadow: "0 3px 0 #dca92e" }
-              : { backgroundColor: "#efe3c8", color: "#a08c66" }
-          }
-        >
-          {grading ? write.grading(buddyName) : write.done}
-        </button>
       </div>
     </>
   );

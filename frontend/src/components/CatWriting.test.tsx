@@ -60,14 +60,18 @@ describe("진행 상황", () => {
     expect(screen.getByText(write.progress(2, 5))).toBeTruthy();
   });
 
-  it("다 안 쓰면 완료 버튼이 잠겨 있다", () => {
+  it("다 쓰기 전엔 완료 버튼이 아예 안 보인다", () => {
+    // 눌러도 안 되는 회색 버튼이 자리만 차지하고 있으면 헷갈려요
     renderWriting(수첩(["하나", "둘", "셋", "넷"]));
-    expect(screen.getByRole("button", { name: write.done })).toHaveProperty("disabled", true);
+    expect(screen.queryByRole("button", { name: write.done })).toBeNull();
+    expect(screen.getByRole("button", { name: write.next })).toBeTruthy();
   });
 
-  it("다섯 개를 다 쓰면 완료 버튼이 열린다", () => {
+  it("다섯 개를 다 쓰면 완료 버튼으로 바뀐다", () => {
     renderWriting(수첩(["하나", "둘", "셋", "넷", "다섯"]));
     expect(screen.getByRole("button", { name: write.done })).toHaveProperty("disabled", false);
+    // 이제 "다음 문장" 은 갈 곳이 없어요
+    expect(screen.queryByRole("button", { name: write.next })).toBeNull();
   });
 });
 

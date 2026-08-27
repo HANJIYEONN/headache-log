@@ -18,11 +18,14 @@ const 가짜 = vi.hoisted(() => ({
   createAccount: vi.fn(),
   fetchMe: vi.fn(),
   replace: vi.fn(),
+  router: { replace: (...args: unknown[]) => 가짜.replace(...args) },
 }));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/cat-note/start",
-  useRouter: () => ({ replace: 가짜.replace }),
+  // 진짜 useRouter 는 늘 같은 객체를 줘요. 매번 새로 만들면
+  //  effect 가 계속 다시 돌아서 화면이 방금 고친 값을 되돌려버려요
+  useRouter: () => 가짜.router,
 }));
 
 vi.mock("@/lib/catApi", () => ({

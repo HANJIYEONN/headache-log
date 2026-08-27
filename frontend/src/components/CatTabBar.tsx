@@ -119,6 +119,13 @@ function ProfileIcon({ className }: IconProps) {
 
 const BASE = "/cat-note";
 
+/** 탭바를 감출 화면 — 수첩을 만드는 중엔 갈 곳이 없어요 */
+const NO_TABBAR = [`${BASE}/start`];
+
+export function hidesTabBar(pathname: string): boolean {
+  return NO_TABBAR.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
 /** 탭 다섯 개. 순서는 시안의 하단 탭바 그대로예요 */
 const TABS = [
   { href: BASE, key: "home", Icon: HomeIcon },
@@ -142,6 +149,10 @@ export function isCurrentTab(pathname: string, href: string): boolean {
 export default function CatTabBar() {
   const t = useT();
   const pathname = usePathname() ?? "";
+
+  // 수첩을 아직 안 만든 사람에게 탭을 보여주면, 눌렀을 때
+  // "수첩이 없어요" 로 튕겨나가요. 만들기가 끝날 때까지는 감춰요.
+  if (hidesTabBar(pathname)) return null;
 
   return (
     <nav

@@ -7,7 +7,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import CatTabBar, { isCurrentTab } from "./CatTabBar";
+import CatTabBar, { hidesTabBar, isCurrentTab } from "./CatTabBar";
 import { dictionaries } from "@/i18n/dictionaries";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
 
@@ -85,5 +85,19 @@ describe("지금 화면 표시", () => {
 
   it("이름이 비슷한 다른 주소에는 안 켜진다", () => {
     expect(isCurrentTab("/cat-note/writer", "/cat-note/write")).toBe(false);
+  });
+});
+
+describe("감춰야 할 때", () => {
+  it("수첩 만드는 중(/cat-note/start)엔 탭바가 안 나온다", () => {
+    // 아직 수첩이 없어서 탭을 눌러도 갈 곳이 없어요
+    const { container } = renderTabBar("/cat-note/start");
+    expect(container.innerHTML).toBe("");
+  });
+
+  it("hidesTabBar 는 만들기 화면에서만 참", () => {
+    expect(hidesTabBar("/cat-note/start")).toBe(true);
+    expect(hidesTabBar("/cat-note")).toBe(false);
+    expect(hidesTabBar("/cat-note/write")).toBe(false);
   });
 });

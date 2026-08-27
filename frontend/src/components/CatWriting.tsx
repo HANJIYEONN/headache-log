@@ -8,7 +8,7 @@
 //   NF-06 글이 유실되면 안 돼요. 타이핑이 멈추면 바로 저장해요.
 // ─────────────────────────────────────────────
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useT } from "@/i18n/LanguageProvider";
 import { saveSentence, type TodayEntry } from "@/lib/catApi";
@@ -30,6 +30,7 @@ function firstEmpty(saved: Record<number, string>): number | null {
 export default function CatWriting({
   entry,
   buddyName,
+  learningLanguage,
   prompt,
   onDone,
   grading,
@@ -37,6 +38,8 @@ export default function CatWriting({
 }: {
   entry: TodayEntry;
   buddyName: string;
+  /** 배우는 언어 — 키보드·사전에 힌트를 줘요 */
+  learningLanguage: string;
   prompt: string | null;
   onDone: () => void;
   grading: boolean;
@@ -59,6 +62,7 @@ export default function CatWriting({
     return start === null ? (entry.sentences.at(-1)?.text ?? "") : "";
   });
   const [saveFailed, setSaveFailed] = useState(false);
+  const box = useRef<HTMLTextAreaElement>(null);
 
   const typed = draft.trim();
   // "저장됐나?"는 따로 기억하지 않고 계산해요.
@@ -69,6 +73,17 @@ export default function CatWriting({
   const others = Array.from({ length: TOTAL }, (_, index) => index + 1).filter(
     (position) => saved[position] && position !== active,
   );
+
+  // 바로 쓸 수 있게 커서를 문장 칸에 놔둬요.
+  // 문장을 옮길 때(다음 문장·고치기)도 따라가요.
+  useEffect(() => {
+    const field = box.current;
+    if (!field || grading) return;
+    field.focus();
+    // 커서는 글 **끝**에 — 고치러 들어왔는데 맨 앞에 놓이면 다시 눌러야 해요
+    const end = field.value.length;
+    field.setSelectionRange(end, end);
+  }, [active, grading]);
 
   // 타이핑이 멈추면 저장해요 (NF-06)
   useEffect(() => {
@@ -170,6 +185,18 @@ export default function CatWriting({
             placeholder={write.placeholder}
             disabled={grading}
             aria-label={write.nth(active)}
+            ref={box}
+            // 배우는 언어를 알려줘요. 키보드 언어를 **강제할 수는 없지만**
+            // (표준 API 가 없어요) iOS 는 사전·자동수정을 여기에 맞춰요
+            lang={learningLanguage}
+            // 🔒 브라우저가 긋는 빨간 줄도 교정이에요 (D-12).
+            //    채점은 다 쓰고 나서 한 번에 하기로 했어요
+            spellCheck={false}
+            // 자동수정·자동대문자를 끄는 이유:
+            // 키보드가 몰래 고쳐버리면 아이가 틀린 걸 짚어볼 기회가 사라져요
+            autoCorrect="off"
+            autoCapitalize="off"
+            enterKeyHint="enter"
             className="mt-1.5 w-full resize-none rounded-2xl border-2 border-[#efe3c8] bg-[#fffdf5] px-4 py-3 text-sm leading-relaxed text-[#4a3a20] outline-none focus:border-[#f5c64b] disabled:opacity-60"
           />
         </label>

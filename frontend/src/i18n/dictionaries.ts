@@ -67,6 +67,18 @@ const ko = {
     building1: "지금 열심히 만들고 있어요.",
     building2: "곧 콩이와 함께 만나요 🐾",
     backHome: "홈으로 돌아가기",
+    tabs: {
+      home: "홈",
+      write: "쓰기",
+      calendar: "달력",
+      friends: "친구",
+      profile: "내 정보",
+    },
+    loading: "잠깐만요…",
+    error: {
+      generic: "잘 안 됐어요. 다시 해볼까요?",
+      retry: "다시 하기",
+    },
   },
   headache: {
     title: "두통 기록 차트",
@@ -188,6 +200,18 @@ const en: Dict = {
     building1: "We're busy building it right now.",
     building2: "See you soon, with Kong-i 🐾",
     backHome: "Back to home",
+    tabs: {
+      home: "Home",
+      write: "Write",
+      calendar: "Calendar",
+      friends: "Friends",
+      profile: "Profile",
+    },
+    loading: "Just a moment…",
+    error: {
+      generic: "That didn't work. Try again?",
+      retry: "Try again",
+    },
   },
   headache: {
     title: "Headache Log",
@@ -305,6 +329,18 @@ const ja: Dict = {
     building1: "いま一生懸命つくっています。",
     building2: "もうすぐコンイと一緒に 🐾",
     backHome: "ホームへ戻る",
+    tabs: {
+      home: "ホーム",
+      write: "書く",
+      calendar: "カレンダー",
+      friends: "友だち",
+      profile: "マイページ",
+    },
+    loading: "ちょっと待ってね…",
+    error: {
+      generic: "うまくいかなかったよ。もう一回やってみる？",
+      retry: "もう一回",
+    },
   },
   headache: {
     title: "頭痛記録チャート",
@@ -422,6 +458,18 @@ const zh: Dict = {
     building1: "正在努力制作中。",
     building2: "很快就和小空一起见面 🐾",
     backHome: "返回首页",
+    tabs: {
+      home: "首页",
+      write: "写作",
+      calendar: "日历",
+      friends: "朋友",
+      profile: "我的",
+    },
+    loading: "稍等一下…",
+    error: {
+      generic: "没成功。再试一次好吗？",
+      retry: "再试一次",
+    },
   },
   headache: {
     title: "头痛记录图表",

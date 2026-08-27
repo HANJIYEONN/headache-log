@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // 개발 중에만 보이는 Next.js 표시를 오른쪽 위로 옮겨요.
+  // 기본값(왼쪽 아래)이면 고양이 수첩 탭바의 "홈" 탭을 가려서 눌러볼 수가 없어요.
+  devIndicators: { position: "top-right" },
+
   // 프록시(rewrites): 브라우저가 우리 프론트 주소의 /backend-api/... 로 요청하면
   // Vercel 서버가 대신 오라클 백엔드로 전달해줘요.
   // 왜 필요하냐면: HTTPS 페이지(Vercel)에서 HTTP 서버(오라클)를 직접 부르면

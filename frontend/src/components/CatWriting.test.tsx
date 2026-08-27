@@ -35,6 +35,7 @@ function renderWriting(entry: TodayEntry) {
       <CatWriting
         entry={entry}
         buddyName="Kong-i"
+        learningLanguage="ko"
         prompt="What did you do today?"
         onDone={가짜.onDone}
         grading={false}
@@ -146,5 +147,44 @@ describe("자동 저장", () => {
     });
 
     expect(await screen.findByText(write.saveFailed, {}, { timeout: 3000 })).toBeTruthy();
+  });
+});
+
+// ── 바로 쓸 수 있게 ───────────────────────────────────
+
+describe("커서와 키보드", () => {
+  it("들어오면 커서가 문장 칸에 있다", async () => {
+    renderWriting(수첩([]));
+    const box = screen.getByRole("textbox", { name: write.nth(1) });
+    expect(document.activeElement).toBe(box);
+  });
+
+  it("고치러 들어가면 커서가 글 끝에 놓인다", async () => {
+    // 맨 앞에 놓이면 이어 쓰려고 또 눌러야 해요
+    const user = userEvent.setup();
+    renderWriting(수첩(["하나", "둘"]));
+
+    await user.click(screen.getByRole("button", { name: /하나/ }));
+
+    const box = screen.getByRole("textbox", { name: write.nth(1) }) as HTMLTextAreaElement;
+    expect(document.activeElement).toBe(box);
+    expect(box.selectionStart).toBe("하나".length);
+  });
+
+  it("배우는 언어를 키보드에 알려준다", () => {
+    renderWriting(수첩([]));
+    // 강제할 순 없지만(표준 API 가 없어요) iOS 는 이걸 참고해요
+    expect(screen.getByRole("textbox", { name: write.nth(1) })).toHaveProperty("lang", "ko");
+  });
+
+  it("브라우저 맞춤법 줄을 끄고, 키보드가 몰래 고치지 못하게 한다", () => {
+    renderWriting(수첩([]));
+    const box = screen.getByRole("textbox", { name: write.nth(1) });
+
+    // 빨간 줄도 교정이에요 (D-12). 채점은 다 쓰고 나서 한 번에
+    expect(box.getAttribute("spellcheck")).toBe("false");
+    // 키보드가 고쳐버리면 아이가 틀린 걸 짚어볼 기회가 사라져요
+    expect(box.getAttribute("autocorrect")).toBe("off");
+    expect(box.getAttribute("autocapitalize")).toBe("off");
   });
 });

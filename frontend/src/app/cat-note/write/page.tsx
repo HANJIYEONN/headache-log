@@ -143,6 +143,7 @@ export default function WritePage() {
           <CatWriting
             entry={entry}
             buddyName={buddyName}
+            learningLanguage={account.learning_language}
             prompt={prompt}
             onDone={finish}
             grading={grading}

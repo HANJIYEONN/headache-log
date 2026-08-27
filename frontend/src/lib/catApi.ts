@@ -66,7 +66,8 @@ export type UpdateAccount = Partial<{
   bio: string;
   avatar: Avatar;
   learning_language: string;
-  feedback_language: string;
+  /** null 을 보내면 "배우는 언어로" 로 되돌아가요 */
+  feedback_language: string | null;
   daily_reminder: boolean;
 }>;
 

@@ -11,6 +11,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import CatAvatar from "@/components/CatAvatar";
+import CatBuddy from "@/components/CatBuddy";
 import CatIcon from "@/components/CatIcon";
 import { LOCALES, LOCALE_LABELS } from "@/i18n/dictionaries";
 import { PageTitle, useT } from "@/i18n/LanguageProvider";
@@ -33,19 +35,9 @@ const NICKNAME_MAX = 10;
 const BIO_MAX = 100;
 const PAUSE_MS = 800;
 
-const AVATARS: { id: Avatar; face: string }[] = [
-  { id: "cat", face: "🐱" },
-  { id: "dog", face: "🐶" },
-  { id: "rabbit", face: "🐰" },
-  { id: "dino", face: "🦖" },
-];
-
-const PARTNERS: { id: Partner; face: string }[] = [
-  { id: "kongi", face: "🐱" },
-  { id: "cheese", face: "🐈" },
-  { id: "meokmul", face: "🐈‍⬛" },
-  { id: "sikppang", face: "🍞" },
-];
+// 이모지 대신 직접 그린 얼굴을 써요 — 폰마다 그림이 달라지지 않게
+const AVATARS: Avatar[] = ["cat", "dog", "rabbit", "dino"];
+const PARTNERS: Partner[] = ["kongi", "cheese", "meokmul", "sikppang"];
 
 type SaveState = "idle" | "saving" | "saved" | "failed";
 
@@ -226,12 +218,12 @@ export default function ProfilePage() {
         {/* 내 동반 동물 */}
         <Card title={profile.avatar}>
           <ul className="flex gap-2">
-            {AVATARS.map(({ id, face }) => (
+            {AVATARS.map((id) => (
               <li key={id} className="flex-1">
                 <Pick
                   picked={account.avatar === id}
                   label={profile.avatars[id]}
-                  face={face}
+                  face={<CatAvatar avatar={id} className="h-8 w-8" />}
                   onPick={() => save({ avatar: id })}
                 />
               </li>
@@ -242,12 +234,12 @@ export default function ProfilePage() {
         {/* 함께 쓰는 짝꿍 — 나중에 바꿔도 돼요 (D-17) */}
         <Card title={profile.partner} hint={profile.partnerHint}>
           <ul className="flex gap-2">
-            {PARTNERS.map(({ id, face }) => (
+            {PARTNERS.map((id) => (
               <li key={id} className="flex-1">
                 <Pick
                   picked={account.partner === id}
                   label={t.catNote.start.partners[id].name}
-                  face={face}
+                  face={<CatBuddy partner={id} className="h-9 w-9" />}
                   onPick={() => save({ partner: id })}
                 />
               </li>
@@ -396,7 +388,7 @@ function Pick({
 }: {
   picked: boolean;
   label: string;
-  face?: string;
+  face?: React.ReactNode;
   onPick: () => void;
 }) {
   return (
@@ -411,11 +403,7 @@ function Pick({
         color: picked ? "#b98a1f" : "#a08c66",
       }}
     >
-      {face && (
-        <span className="text-lg" aria-hidden="true">
-          {face}
-        </span>
-      )}
+      {face}
       {label}
     </button>
   );

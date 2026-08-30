@@ -10,6 +10,7 @@
 
 import { useState } from "react";
 
+import CatAvatar from "@/components/CatAvatar";
 import { useLanguage, useT } from "@/i18n/LanguageProvider";
 import {
   fetchComments,
@@ -20,12 +21,6 @@ import {
 } from "@/lib/catApi";
 import { timeAgo } from "@/lib/timeAgo";
 
-const AVATAR_FACE: Record<FeedCard["avatar"], string> = {
-  cat: "🐱",
-  dog: "🐶",
-  rabbit: "🐰",
-  dino: "🦖",
-};
 
 const COMMENT_MAX = 200;
 
@@ -92,9 +87,7 @@ export default function CatFriendCard({ card }: { card: FeedCard }) {
     <li className="rounded-2xl border border-[#efe3c8] bg-[#fffdf5] px-4 py-3">
       {/* 누가 · 언제 · 얼마나 */}
       <div className="flex items-center gap-2">
-        <span className="text-xl" aria-hidden="true">
-          {AVATAR_FACE[card.avatar]}
-        </span>
+        <CatAvatar avatar={card.avatar} className="h-8 w-8 shrink-0" />
         <span className="flex-1">
           <span className="block text-sm font-bold text-[#4a3a20]">{card.nickname}</span>
           <span className="block text-[10px] text-[#a08c66]">

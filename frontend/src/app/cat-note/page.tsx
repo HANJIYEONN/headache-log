@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import CatBuddy from "@/components/CatBuddy";
 import CatIcon from "@/components/CatIcon";
 import { PageTitle, useLanguage, useT } from "@/i18n/LanguageProvider";
 import {
@@ -30,13 +31,6 @@ import {
 import { useLoginUser } from "@/lib/useLoginUser";
 
 const TOTAL = 5;
-
-const BUDDY_FACE: Record<CatAccount["partner"], string> = {
-  kongi: "🐱",
-  cheese: "🐈",
-  meokmul: "🐈‍⬛",
-  sikppang: "🍞",
-};
 
 /**
  * "2026-08-27" 을 그 나라 말로 바꿔요.
@@ -195,9 +189,7 @@ export default function CatNoteHome() {
 
         {/* 짝꿍 한마디 — 말투가 짝꿍마다 달라요 (D-16) */}
         <div className="mt-4 flex items-start gap-2 rounded-2xl bg-[#f5eee0] px-4 py-3">
-          <span className="text-xl" aria-hidden="true">
-            {BUDDY_FACE[account.partner]}
-          </span>
+          <CatBuddy partner={account.partner} className="h-8 w-8 shrink-0" />
           <p className="flex-1 text-xs leading-relaxed text-[#7a6a48]">
             {home.buddySays[account.partner]}
           </p>

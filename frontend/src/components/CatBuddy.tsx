@@ -116,6 +116,7 @@ export function MeokmulFace({ className = "h-8 w-8" }: Props) {
   const body = "#5d5765";
   const inner = "#847c8f";
   const line = "#f4ece0";
+  const eye = "#f2c14e";
   return (
     <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
       <path d="M11 18 L14 4 L25 13 Z" fill={body} />
@@ -123,23 +124,16 @@ export function MeokmulFace({ className = "h-8 w-8" }: Props) {
       <path d="M15 16.5 L16.6 8.5 L22 13.8 Z" fill={inner} />
       <path d="M33 16.5 L31.4 8.5 L26 13.8 Z" fill={inner} />
       <circle cx="24" cy="26" r="15" fill={body} />
-      {/* 살짝 내리뜬 눈 — 동그랗게 뜨면 인형 눈처럼 보여요 */}
-      <ellipse cx="18" cy="26.8" rx="3.2" ry="2.4" fill={line} />
-      <ellipse cx="30" cy="26.8" rx="3.2" ry="2.4" fill={line} />
-      <circle cx="18.3" cy="27" r="1.5" fill="#2f2b36" />
-      <circle cx="30.3" cy="27" r="1.5" fill="#2f2b36" />
-      <circle cx="17.7" cy="26.3" r="0.6" fill="#fffdf5" />
-      <circle cx="29.7" cy="26.3" r="0.6" fill="#fffdf5" />
-      {/* 눈꺼풀을 살짝 덮어 차분하게 */}
-      <path
-        d="M14.8 25 Q18 23.2 21.2 25 M26.8 25 Q30 23.2 33.2 25"
-        stroke={body}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <ellipse cx="13.5" cy="31" rx="3.2" ry="1.9" fill="#c58e93" opacity="0.35" />
-      <ellipse cx="34.5" cy="31" rx="3.2" ry="1.9" fill="#c58e93" opacity="0.35" />
+      {/* 크고 노란 눈에 세로 동공 — 검은 고양이답게 또렷하게.
+          동그란 흰 눈은 인형 같아서, 이쪽이 훨씬 먹물이다워요 */}
+      <ellipse cx="17.6" cy="26.6" rx="4.4" ry="4.9" fill={eye} />
+      <ellipse cx="30.4" cy="26.6" rx="4.4" ry="4.9" fill={eye} />
+      <ellipse cx="17.6" cy="26.6" rx="1.3" ry="4" fill="#241f2b" />
+      <ellipse cx="30.4" cy="26.6" rx="1.3" ry="4" fill="#241f2b" />
+      <circle cx="19.4" cy="24.4" r="1" fill="#fffdf5" opacity="0.9" />
+      <circle cx="32.2" cy="24.4" r="1" fill="#fffdf5" opacity="0.9" />
+      <ellipse cx="12.8" cy="32" rx="3" ry="1.8" fill="#c58e93" opacity="0.3" />
+      <ellipse cx="35.2" cy="32" rx="3" ry="1.8" fill="#c58e93" opacity="0.3" />
       <NoseMouth stroke={line} />
       <Whiskers stroke={line} long />
     </svg>

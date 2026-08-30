@@ -162,6 +162,20 @@ const ko = {
       streak: (n: number) => `${n}일 연속`,
       saveVocab: "단어장에 담기",
       savedVocab: "담았어요",
+      buddySays: {
+        allClean: {
+          kongi: "우와~ 하나도 안 틀렸어! 최고야 🐾",
+          cheese: "오, 오늘 완벽한데?",
+          meokmul: "오늘은 고칠 곳이 없네요. 훌륭해요.",
+          sikppang: "다 맞았네~ 잘했어 정말",
+        },
+        fixed: {
+          kongi: "고친 걸 봤으니까 내일은 더 잘 쓸 거야. 참 잘했어요 🐾",
+          cheese: "틀린 건 하나도 안 창피해. 오늘도 다섯 줄 다 썼잖아",
+          meokmul: "고친 부분을 한 번 더 읽어 보세요. 오늘도 수고했어요.",
+          sikppang: "틀려도 괜찮아~ 끝까지 쓴 게 대단해",
+        },
+      },
       goHome: "홈으로",
     },
     calendar: {
@@ -448,6 +462,20 @@ const en: Dict = {
       streak: (n: number) => `${n}-day streak`,
       saveVocab: "Save to word list",
       savedVocab: "Saved",
+      buddySays: {
+        allClean: {
+          kongi: "Wow, not a single mistake! You're the best 🐾",
+          cheese: "Oh, perfect today?",
+          meokmul: "Nothing to fix today. Excellent.",
+          sikppang: "All correct~ really well done",
+        },
+        fixed: {
+          kongi: "You saw the fixes, so tomorrow will be even better. Great job 🐾",
+          cheese: "Mistakes aren't embarrassing. You wrote all five lines today",
+          meokmul: "Read the corrections once more. Well done today.",
+          sikppang: "It's okay to get things wrong~ finishing is what counts",
+        },
+      },
       goHome: "Home",
     },
     calendar: {
@@ -730,6 +758,20 @@ const ja: Dict = {
       streak: (n: number) => `${n}日れんぞく`,
       saveVocab: "ことば帳に入れる",
       savedVocab: "入れたよ",
+      buddySays: {
+        allClean: {
+          kongi: "わあ、ひとつも まちがえてない！さいこう 🐾",
+          cheese: "お、きょうは完璧じゃん？",
+          meokmul: "きょうは直すところがありませんね。すばらしいです。",
+          sikppang: "ぜんぶ合ってるね〜 よくできました",
+        },
+        fixed: {
+          kongi: "直したところを見たから、あしたはもっと上手だよ。よくがんばったね 🐾",
+          cheese: "まちがいは はずかしくないよ。きょうも5行ぜんぶ書いたじゃん",
+          meokmul: "直したところをもう一度読んでみてください。きょうもおつかれさまでした。",
+          sikppang: "まちがえても大丈夫〜 最後まで書いたのがすごいよ",
+        },
+      },
       goHome: "ホームへ",
     },
     calendar: {
@@ -1012,6 +1054,20 @@ const zh: Dict = {
       streak: (n: number) => `连续 ${n} 天`,
       saveVocab: "存进单词本",
       savedVocab: "已存入",
+      buddySays: {
+        allClean: {
+          kongi: "哇～一个都没错！太棒了 🐾",
+          cheese: "哦，今天完美嘛？",
+          meokmul: "今天没有要改的地方。很棒。",
+          sikppang: "全对了呢～真的做得好",
+        },
+        fixed: {
+          kongi: "看过改的地方，明天会写得更好。真棒 🐾",
+          cheese: "写错一点也不丢人。今天五句也都写完了嘛",
+          meokmul: "把改过的地方再读一遍吧。今天也辛苦了。",
+          sikppang: "写错也没关系～能写到最后就很厉害",
+        },
+      },
       goHome: "回首页",
     },
     calendar: {

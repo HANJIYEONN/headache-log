@@ -192,3 +192,26 @@ describe("커서와 키보드", () => {
     expect(box.getAttribute("autocapitalize")).toBe("off");
   });
 });
+
+// ── 글자 수 ───────────────────────────────────────────
+
+describe("글자 수", () => {
+  it("몇 자 썼는지 보여준다", () => {
+    renderWriting(수첩([]));
+    expect(screen.getByText("0/50")).toBeTruthy();
+
+    fireEvent.change(screen.getByRole("textbox", { name: write.nth(1) }), {
+      target: { value: "오늘은 비가 왔다" },
+    });
+    expect(screen.getByText("9/50")).toBeTruthy();
+  });
+
+  it("50자를 넘겨 칠 수 없다", () => {
+    renderWriting(수첩([]));
+    // 다 쓴 뒤에 "너무 길어요" 라고 하면 지우는 게 일이에요.
+    // 아예 안 쳐지는 편이 나아요
+    expect(
+      screen.getByRole("textbox", { name: write.nth(1) }).getAttribute("maxlength"),
+    ).toBe("50");
+  });
+});

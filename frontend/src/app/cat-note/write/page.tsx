@@ -133,6 +133,7 @@ export default function WritePage() {
         {graded ? (
           <CatResult
             accuracy={graded.accuracy}
+            partner={account.partner}
             sentences={graded.sentences}
             newExpressions={graded.new_expressions}
             // 발도장·연속은 방금 낸 결과에만 담겨 와요 ("지금" 값이라서요)

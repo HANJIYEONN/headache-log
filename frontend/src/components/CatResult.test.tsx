@@ -46,6 +46,7 @@ function renderResult(sentences = [맞은문장, 틀린문장]) {
     <LanguageProvider>
       <CatResult
         accuracy={80}
+        partner="sikppang"
         sentences={sentences}
         newExpressions={["좋아요"]}
         streakDays={3}
@@ -140,5 +141,36 @@ describe("단어장에 담기", () => {
     await user.click(screen.getByRole("button", { name: `+ ${result.saveVocab}` }));
 
     expect(await screen.findByRole("button", { name: `✓ ${result.savedVocab}` })).toBeTruthy();
+  });
+});
+
+// ── 짝꿍의 한마디 ─────────────────────────────────────
+
+describe("짝꿍의 한마디", () => {
+  it("고친 게 있으면 격려한다 (혼내지 않아요)", () => {
+    renderResult();
+    expect(screen.getByText(result.buddySays.fixed.sikppang)).toBeTruthy();
+  });
+
+  it("하나도 안 틀렸으면 다르게 말한다", () => {
+    renderResult([맞은문장]);
+    expect(screen.getByText(result.buddySays.allClean.sikppang)).toBeTruthy();
+    expect(screen.queryByText(result.buddySays.fixed.sikppang)).toBeNull();
+  });
+
+  it("짝꿍마다 말투가 다르다 (D-16)", () => {
+    render(
+      <LanguageProvider>
+        <CatResult
+          accuracy={100}
+          partner="meokmul"
+          sentences={[맞은문장]}
+          newExpressions={[]}
+          streakDays={null}
+          totalStamps={null}
+        />
+      </LanguageProvider>,
+    );
+    expect(screen.getByText(result.buddySays.allClean.meokmul)).toBeTruthy();
   });
 });

@@ -14,7 +14,8 @@ import { useT } from "@/i18n/LanguageProvider";
 import { saveSentence, type TodayEntry } from "@/lib/catApi";
 
 const TOTAL = 5;
-const SENTENCE_MAX = 200;
+// 서버가 정한 규칙과 같은 값이어야 해요 (app/cat_schemas.py)
+const SENTENCE_MAX = 50;
 
 /** 타이핑이 멈추고 이만큼 지나면 저장해요 */
 const PAUSE_MS = 800;
@@ -176,7 +177,16 @@ export default function CatWriting({
       {/* 지금 쓰는 문장 */}
       <div className="mt-4">
         <label className="block">
-          <span className="text-xs font-bold text-[#7a6a48]">{write.nth(active)}</span>
+          <span className="flex items-baseline justify-between">
+            <span className="text-xs font-bold text-[#7a6a48]">{write.nth(active)}</span>
+            {/* 몇 자 남았는지 — 다 채우면 빨갛게 */}
+            <span
+              className="text-[11px] font-medium tabular-nums"
+              style={{ color: draft.length >= SENTENCE_MAX ? "#c07777" : "#a08c66" }}
+            >
+              {draft.length}/{SENTENCE_MAX}
+            </span>
+          </span>
           <textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}

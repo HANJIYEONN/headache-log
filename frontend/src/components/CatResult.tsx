@@ -11,7 +11,14 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { useT } from "@/i18n/LanguageProvider";
-import { saveVocab, type Correction, type GradedSentence } from "@/lib/catApi";
+import { saveVocab, type Correction, type GradedSentence, type Partner } from "@/lib/catApi";
+
+const BUDDY_FACE: Record<Partner, string> = {
+  kongi: "🐱",
+  cheese: "🐈",
+  meokmul: "🐈‍⬛",
+  sikppang: "🍞",
+};
 
 /**
  * 틀린 부분에 물결 밑줄을 그어요.
@@ -44,12 +51,14 @@ export function markWrong(text: string, corrections: Correction[]) {
 
 export default function CatResult({
   accuracy,
+  partner,
   sentences,
   newExpressions,
   streakDays,
   totalStamps,
 }: {
   accuracy: number | null;
+  partner: Partner;
   sentences: GradedSentence[];
   newExpressions: string[];
   streakDays: number | null;
@@ -59,6 +68,9 @@ export default function CatResult({
   const result = t.catNote.result;
 
   // 단어장에 담은 교정 번호 (버튼을 두 번 못 누르게)
+  // 고친 곳이 하나도 없나? 짝꿍이 할 말이 달라져요
+  const allClean = sentences.every((sentence) => sentence.corrections.length === 0);
+
   const [saving, setSaving] = useState<number | null>(null);
   const [savedIds, setSavedIds] = useState<number[]>([]);
 
@@ -187,9 +199,20 @@ export default function CatResult({
         </div>
       )}
 
+      {/* 짝꿍의 한마디 — 다 맞았을 때와 고친 게 있을 때 말이 달라요.
+          틀렸다고 혼내지 않아요. 끝까지 쓴 걸 먼저 칭찬해요 */}
+      <div className="mt-6 flex items-start gap-2.5 rounded-2xl bg-[#fbefc9] px-4 py-3">
+        <span className="text-2xl" aria-hidden="true">
+          {BUDDY_FACE[partner]}
+        </span>
+        <p className="flex-1 text-sm leading-relaxed text-[#7a6a48]">
+          {allClean ? result.buddySays.allClean[partner] : result.buddySays.fixed[partner]}
+        </p>
+      </div>
+
       <Link
         href="/cat-note"
-        className="mt-6 block rounded-2xl bg-[#f5c64b] px-6 py-3 text-center text-sm font-bold text-[#4a3a20] shadow-[0_3px_0_#dca92e] transition hover:bg-[#f0bb38]"
+        className="mt-4 block rounded-2xl bg-[#f5c64b] px-6 py-3 text-center text-sm font-bold text-[#4a3a20] shadow-[0_3px_0_#dca92e] transition hover:bg-[#f0bb38]"
       >
         {result.goHome}
       </Link>

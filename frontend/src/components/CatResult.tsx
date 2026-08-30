@@ -10,16 +10,11 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import CatBuddy from "@/components/CatBuddy";
 import { moodOf, pickLine } from "@/i18n/buddyLines";
 import { useLanguage, useT } from "@/i18n/LanguageProvider";
 import { saveVocab, type Correction, type GradedSentence, type Partner } from "@/lib/catApi";
 
-const BUDDY_FACE: Record<Partner, string> = {
-  kongi: "🐱",
-  cheese: "🐈",
-  meokmul: "🐈‍⬛",
-  sikppang: "🍞",
-};
 
 /**
  * 틀린 부분에 물결 밑줄을 그어요.
@@ -209,9 +204,7 @@ export default function CatResult({
       {/* 짝꿍의 한마디 — 다 맞았을 때와 고친 게 있을 때 말이 달라요.
           틀렸다고 혼내지 않아요. 끝까지 쓴 걸 먼저 칭찬해요 */}
       <div className="mt-6 flex items-start gap-2.5 rounded-2xl bg-[#fbefc9] px-4 py-3">
-        <span className="text-2xl" aria-hidden="true">
-          {BUDDY_FACE[partner]}
-        </span>
+        <CatBuddy partner={partner} className="h-10 w-10 shrink-0" />
         <p className="flex-1 text-sm leading-relaxed text-[#7a6a48]">
           {buddyLine}
         </p>

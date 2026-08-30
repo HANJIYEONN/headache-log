@@ -12,6 +12,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import CatAvatar from "@/components/CatAvatar";
 import CatFriendCard from "@/components/CatFriendCard";
 import CatIcon from "@/components/CatIcon";
 import { PageTitle, useT } from "@/i18n/LanguageProvider";
@@ -30,12 +31,6 @@ import {
 } from "@/lib/catApi";
 import { useLoginUser } from "@/lib/useLoginUser";
 
-const AVATAR_FACE: Record<string, string> = {
-  cat: "🐱",
-  dog: "🐶",
-  rabbit: "🐰",
-  dino: "🦖",
-};
 
 export default function FriendsPage() {
   const t = useT();
@@ -228,9 +223,7 @@ export default function FriendsPage() {
             <div className="mt-2">
               {found.found ? (
                 <div className="flex items-center gap-2 rounded-xl bg-[#faf4e4] px-3 py-2">
-                  <span className="text-lg" aria-hidden="true">
-                    {AVATAR_FACE[found.avatar]}
-                  </span>
+                  <CatAvatar avatar={found.avatar} className="h-7 w-7 shrink-0" />
                   <span className="flex-1 text-sm text-[#4a3a20]">
                     {found.nickname}
                     <span className="ml-1 text-[10px] text-[#a08c66]">@{found.note_id}</span>
@@ -260,9 +253,7 @@ export default function FriendsPage() {
             <ul className="mt-2 space-y-2">
               {list.pending_received.map((asker) => (
                 <li key={asker.friendship_id} className="flex items-center gap-2">
-                  <span className="text-lg" aria-hidden="true">
-                    {AVATAR_FACE[asker.avatar]}
-                  </span>
+                  <CatAvatar avatar={asker.avatar} className="h-7 w-7 shrink-0" />
                   <span className="flex-1 text-sm text-[#4a3a20]">
                     {asker.nickname}
                     <span className="ml-1 text-[10px] text-[#a08c66]">@{asker.note_id}</span>
@@ -298,9 +289,7 @@ export default function FriendsPage() {
             <ul className="mt-2 space-y-2">
               {list.friends.map((friend) => (
                 <li key={friend.note_id} className="flex items-center gap-2">
-                  <span className="text-lg" aria-hidden="true">
-                    {AVATAR_FACE[friend.avatar]}
-                  </span>
+                  <CatAvatar avatar={friend.avatar} className="h-7 w-7 shrink-0" />
                   <span className="flex-1 text-sm text-[#4a3a20]">
                     {friend.nickname}
                     <span className="ml-1 text-[10px] text-[#a08c66]">@{friend.note_id}</span>

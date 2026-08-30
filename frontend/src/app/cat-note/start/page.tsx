@@ -13,6 +13,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import CatBuddy from "@/components/CatBuddy";
 import CatIcon from "@/components/CatIcon";
 import { PageTitle, useT } from "@/i18n/LanguageProvider";
 import {
@@ -33,12 +34,8 @@ const NICKNAME_MAX = 10;
 /** 아이디를 확인하러 가기 전에 기다리는 시간 — 타이핑이 멈췄을 때만 물어봐요 */
 const PAUSE_MS = 400;
 
-const PARTNERS: { id: Partner; face: string }[] = [
-  { id: "kongi", face: "🐱" },
-  { id: "cheese", face: "🐈" },
-  { id: "meokmul", face: "🐈‍⬛" },
-  { id: "sikppang", face: "🍞" },
-];
+// 이모지 대신 직접 그린 얼굴을 써요 — 폰마다 그림이 달라지지 않게
+const PARTNERS: Partner[] = ["kongi", "cheese", "meokmul", "sikppang"];
 
 export default function StartPage() {
   const t = useT();
@@ -183,7 +180,7 @@ function PickPartner({
       </p>
 
       <ul className="mt-6 space-y-3">
-        {PARTNERS.map(({ id, face }) => {
+        {PARTNERS.map((id) => {
           const buddy = t.catNote.start.partners[id];
           const chosen = picked === id;
           return (
@@ -202,9 +199,7 @@ function PickPartner({
                   backgroundColor: chosen ? "#fbefc9" : "#fffdf5",
                 }}
               >
-                <span className="text-2xl" aria-hidden="true">
-                  {face}
-                </span>
+                <CatBuddy partner={id} className="h-11 w-11 shrink-0" />
                 <span className="flex-1">
                   <span className="block text-sm font-bold text-[#4a3a20]">
                     {buddy.name}

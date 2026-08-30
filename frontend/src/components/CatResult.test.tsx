@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import CatResult, { markWrong } from "./CatResult";
 import { dictionaries } from "@/i18n/dictionaries";
+import { BUDDY_LINES, moodOf, pickLine } from "@/i18n/buddyLines";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
 import type { GradedSentence } from "@/lib/catApi";
 
@@ -41,15 +42,16 @@ const 틀린문장: GradedSentence = {
   ],
 };
 
-function renderResult(sentences = [맞은문장, 틀린문장]) {
+function renderResult(sentences = [맞은문장, 틀린문장], streakDays = 3, accuracy = 80) {
   return render(
     <LanguageProvider>
       <CatResult
-        accuracy={80}
+        accuracy={accuracy}
+        entryId={12}
         partner="sikppang"
         sentences={sentences}
         newExpressions={["좋아요"]}
-        streakDays={3}
+        streakDays={streakDays}
         totalStamps={12}
       />
     </LanguageProvider>,
@@ -147,30 +149,80 @@ describe("단어장에 담기", () => {
 // ── 짝꿍의 한마디 ─────────────────────────────────────
 
 describe("짝꿍의 한마디", () => {
-  it("고친 게 있으면 격려한다 (혼내지 않아요)", () => {
-    renderResult();
-    expect(screen.getByText(result.buddySays.fixed.sikppang)).toBeTruthy();
+  it("고친 게 있으면 격려하는 말이 나온다 (혼내지 않아요)", () => {
+    // 연속 기록(3일↑)과 "거의 다 맞음"(80%↑)이 먼저 잡히니 둘 다 낮춰요
+    renderResult([맞은문장, 틀린문장], 1, 40);
+    const 후보 = BUDDY_LINES.en.sikppang.fixed;
+    const 보인_말 = 후보.find((line) => screen.queryByText(line));
+    expect(보인_말).toBeDefined();
   });
 
-  it("하나도 안 틀렸으면 다르게 말한다", () => {
-    renderResult([맞은문장]);
-    expect(screen.getByText(result.buddySays.allClean.sikppang)).toBeTruthy();
-    expect(screen.queryByText(result.buddySays.fixed.sikppang)).toBeNull();
+  it("하나도 안 틀렸으면 다른 묶음에서 나온다", () => {
+    renderResult([맞은문장], 1);
+    const 칭찬 = BUDDY_LINES.en.sikppang.allClean;
+    expect(칭찬.some((line) => screen.queryByText(line))).toBe(true);
+    // 격려하는 말이 섞여 나오면 안 돼요
+    expect(BUDDY_LINES.en.sikppang.fixed.some((line) => screen.queryByText(line))).toBe(false);
   });
 
-  it("짝꿍마다 말투가 다르다 (D-16)", () => {
-    render(
-      <LanguageProvider>
-        <CatResult
-          accuracy={100}
-          partner="meokmul"
-          sentences={[맞은문장]}
-          newExpressions={[]}
-          streakDays={null}
-          totalStamps={null}
-        />
-      </LanguageProvider>,
+  it("같은 수첩이면 늘 같은 말 — 열어볼 때마다 바뀌면 어지러워요", () => {
+    const 먼저 = pickLine("ko", "kongi", "allClean", 12);
+    expect(pickLine("ko", "kongi", "allClean", 12)).toBe(먼저);
+  });
+
+  it("수첩이 다르면 다른 말도 나온다", () => {
+    const 말들 = new Set(
+      Array.from({ length: 10 }, (_, i) => pickLine("ko", "kongi", "allClean", i)),
     );
-    expect(screen.getByText(result.buddySays.allClean.meokmul)).toBeTruthy();
+    expect(말들.size).toBeGreaterThan(1);
+  });
+
+  it("짝꿍마다 50마디씩, 네 언어 모두", () => {
+    for (const locale of ["ko", "en", "ja", "zh"] as const) {
+      for (const partner of ["kongi", "cheese", "meokmul", "sikppang"] as const) {
+        const 전체 = Object.values(BUDDY_LINES[locale][partner]).flat();
+        expect(전체).toHaveLength(50);
+        // 같은 말이 두 번 들어가면 그만큼 덜 다양해져요
+        expect(new Set(전체).size).toBe(50);
+      }
+    }
+  });
+});
+
+// ── 어떤 날이었나 고르기 ──────────────────────────────
+
+describe("상황 고르기", () => {
+  it("첫 수첩이 제일 먼저", () => {
+    expect(moodOf({ allClean: true, accuracy: 100, totalStamps: 1, streakDays: 1 })).toBe(
+      "firstDay",
+    );
+  });
+
+  it("다 맞은 날은 연속 기록보다 앞", () => {
+    // 다 맞은 건 흔치 않으니 그 말을 놓치면 아까워요
+    expect(moodOf({ allClean: true, accuracy: 100, totalStamps: 9, streakDays: 5 })).toBe(
+      "allClean",
+    );
+  });
+
+  it("며칠째 이어 쓰는 중", () => {
+    expect(moodOf({ allClean: false, accuracy: 60, totalStamps: 9, streakDays: 5 })).toBe(
+      "streak",
+    );
+  });
+
+  it("많이 틀린 날에 '완벽해!' 가 나오면 안 돼요", () => {
+    expect(moodOf({ allClean: false, accuracy: 20, totalStamps: 9, streakDays: 1 })).toBe(
+      "fixed",
+    );
+    expect(moodOf({ allClean: false, accuracy: 80, totalStamps: 9, streakDays: 1 })).toBe(
+      "almost",
+    );
+  });
+
+  it("지난 날짜를 열어봐도(발도장·연속 없음) 괜찮다", () => {
+    expect(moodOf({ allClean: true, accuracy: 100, totalStamps: null, streakDays: null })).toBe(
+      "allClean",
+    );
   });
 });

@@ -133,6 +133,7 @@ export default function WritePage() {
         {graded ? (
           <CatResult
             accuracy={graded.accuracy}
+            entryId={graded.entry_id}
             partner={account.partner}
             sentences={graded.sentences}
             newExpressions={graded.new_expressions}

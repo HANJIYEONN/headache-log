@@ -10,7 +10,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { useT } from "@/i18n/LanguageProvider";
+import { moodOf, pickLine } from "@/i18n/buddyLines";
+import { useLanguage, useT } from "@/i18n/LanguageProvider";
 import { saveVocab, type Correction, type GradedSentence, type Partner } from "@/lib/catApi";
 
 const BUDDY_FACE: Record<Partner, string> = {
@@ -51,6 +52,7 @@ export function markWrong(text: string, corrections: Correction[]) {
 
 export default function CatResult({
   accuracy,
+  entryId,
   partner,
   sentences,
   newExpressions,
@@ -58,6 +60,8 @@ export default function CatResult({
   totalStamps,
 }: {
   accuracy: number | null;
+  /** 어떤 말을 고를지 정하는 씨앗 — 같은 날엔 늘 같은 말이 나와요 */
+  entryId: number;
   partner: Partner;
   sentences: GradedSentence[];
   newExpressions: string[];
@@ -65,11 +69,14 @@ export default function CatResult({
   totalStamps: number | null;
 }) {
   const t = useT();
+  const { locale } = useLanguage();
   const result = t.catNote.result;
 
   // 단어장에 담은 교정 번호 (버튼을 두 번 못 누르게)
-  // 고친 곳이 하나도 없나? 짝꿍이 할 말이 달라져요
+  // 오늘이 어떤 날이었나 — 짝꿍이 할 말이 달라져요
   const allClean = sentences.every((sentence) => sentence.corrections.length === 0);
+  const mood = moodOf({ allClean, accuracy, totalStamps, streakDays });
+  const buddyLine = pickLine(locale, partner, mood, entryId);
 
   const [saving, setSaving] = useState<number | null>(null);
   const [savedIds, setSavedIds] = useState<number[]>([]);
@@ -206,7 +213,7 @@ export default function CatResult({
           {BUDDY_FACE[partner]}
         </span>
         <p className="flex-1 text-sm leading-relaxed text-[#7a6a48]">
-          {allClean ? result.buddySays.allClean[partner] : result.buddySays.fixed[partner]}
+          {buddyLine}
         </p>
       </div>
 

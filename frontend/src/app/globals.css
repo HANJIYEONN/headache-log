@@ -28,3 +28,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 블로그 전용 우드 테마: 질감 대신 절제된 월넛·샌드 색으로 표현해요. */
+.blog-wood-shell {
+  background: linear-gradient(135deg, #35241d 0%, #5a4032 52%, #402c24 100%);
+}
+
+.blog-wood-page {
+  background: #eee2d0;
+  border-inline: 1px solid rgb(60 38 27 / 28%);
+}
+
+.blog-wood-card {
+  background: #f8f2e9;
+}

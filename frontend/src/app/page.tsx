@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BrainIcon from "@/components/BrainIcon";
+import BlogIcon from "@/components/BlogIcon";
 import CatIcon from "@/components/CatIcon";
 import LogoutIcon from "@/components/LogoutIcon";
 import { useLoginUser } from "@/lib/useLoginUser";
@@ -45,6 +46,15 @@ const CATNOTE = {
   arrow: "text-[#dccb9e]",
 };
 
+// 블로그는 따뜻한 나무 서재 같은 오크/월넛 색을 써요.
+const BLOG = {
+  box: "bg-[#f8efe3] border-[#c9a77d]",
+  icon: "bg-[#e2c4a0] text-[#6b412c]",
+  title: "text-[#4a2f22]",
+  desc: "text-[#806044]",
+  arrow: "text-[#8a5b38]",
+};
+
 // 프로젝트 목록 — 제목·설명은 언어마다 달라지니까 여기 두지 않고,
 // 아래 컴포넌트 안에서 사전(t)을 보고 채워요.
 // href가 있으면 들어갈 수 있고, ready:false면 "준비 중"
@@ -52,6 +62,7 @@ const CATNOTE = {
 const PROJECTS = [
   { key: "headache", href: "/headache", ready: true, theme: MINT, Icon: BrainIcon },
   { key: "cat-note", href: "/cat-note", ready: true, theme: CATNOTE, Icon: CatIcon },
+  { key: "blog", href: "/blog", ready: true, theme: BLOG, Icon: BlogIcon },
 ];
 
 export default function Home() {
@@ -61,6 +72,7 @@ export default function Home() {
   const PROJECT_TEXT: Record<string, { title: string; description: string }> = {
     headache: { title: t.home.headacheTitle, description: t.home.headacheDesc },
     "cat-note": { title: t.home.catNoteTitle, description: t.home.catNoteDesc },
+    blog: { title: t.home.blogTitle, description: t.home.blogDesc },
   };
 
   // 로그인한 사용자 이름 (확인 끝나야 화면을 보여줘요)
@@ -76,6 +88,7 @@ export default function Home() {
   function handleLogout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
+    localStorage.removeItem("blog_nickname");
     window.location.href = "/login";
   }
 

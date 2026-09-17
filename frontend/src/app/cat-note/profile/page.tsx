@@ -143,6 +143,7 @@ export default function ProfilePage() {
   function logout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
+    localStorage.removeItem("blog_nickname");
     window.location.href = "/login";
   }
 

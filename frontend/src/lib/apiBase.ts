@@ -30,6 +30,7 @@ export function checkAuth(res: Response) {
   if (res.status === 401) {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
+    localStorage.removeItem("blog_nickname");
     window.location.href = "/login";
   }
 }

@@ -77,7 +77,7 @@ export default function BlogPostList({ limit, layout = "list" }: BlogPostListPro
         <Link
           key={post.id}
           href={`/blog/${post.id}`}
-          className={`blog-wood-card block rounded-lg border border-[#b89678] shadow-[0_2px_5px_rgba(55,34,24,0.10)] transition hover:-translate-y-0.5 hover:border-[#76513b] hover:shadow-[0_6px_14px_rgba(55,34,24,0.16)] ${
+          className={`blog-wood-card block rounded-lg border border-[#b89678] shadow-[0_2px_5px_rgba(55,34,24,0.10)] transition duration-200 hover:-translate-y-1 hover:border-[#76513b] hover:shadow-[0_8px_18px_rgba(55,34,24,0.20)] focus-visible:-translate-y-1 focus-visible:border-[#76513b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76513b] focus-visible:ring-offset-2 ${
             layout === "grid" ? "min-h-64 p-5" : "p-6"
           }`}
         >

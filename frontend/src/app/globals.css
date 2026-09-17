@@ -42,3 +42,13 @@ body {
 .blog-wood-card {
   background: #f8f2e9;
 }
+
+.blog-wood-card:hover,
+.blog-wood-card:focus-visible {
+  background: #e4cdb0;
+}
+
+.blog-wood-card:hover h2,
+.blog-wood-card:focus-visible h2 {
+  color: #2f1c15;
+}
